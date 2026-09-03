@@ -1,0 +1,2382 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jornada — Vonex.AI</title>
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+/* ══════════════════════════════════════════════════════════════
+   IA PANORÂMICA (CCM-3269) — PROPOSTA C: NATIVA DA JORNADA
+   Habilitada na criação da jornada; a análise vira uma aba dela.
+   ANGULAR: JourneyModule — src/app/@modules/journey/
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── LISTAGEM DE JORNADAS ─────────────────────────────────── */
+.lst-bar{
+  display:flex;align-items:center;gap:10px;
+  padding:0 24px 16px;background:var(--background-color-lightest);
+}
+.lst-search{position:relative;flex:0 0 600px;max-width:100%;}
+.lst-search i{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--neutral-color-low-light);}
+.lst-search input{
+  width:100%;height:44px;border:1px solid var(--neutral-color-high-medium);border-radius:var(--r-pill);
+  padding:0 16px 0 40px;font-size:14px;color:var(--neutral-color-low-pure);
+  background:var(--background-color-lightest);outline:none;
+}
+.lst-search input:focus{border-color:var(--brand-color-secundary-pure);}
+.lst-adv{
+  display:inline-flex;align-items:center;gap:7px;border:none;background:none;
+  color:var(--brand-color-primary-pure);font-size:14px;font-weight:500;
+}
+.lst-adv i{font-size:17px;}
+.lst-kebab{
+  width:32px;height:32px;border-radius:var(--r-sm);border:none;background:none;
+  color:var(--neutral-color-low-medium);font-size:18px;
+}
+.lst-kebab:hover{background:var(--neutral-color-high-light);}
+.lst-filters{padding:14px 24px 6px;}
+.chip-filter{
+  display:inline-flex;align-items:center;gap:9px;
+  border:1px solid var(--neutral-color-high-dark);border-radius:var(--r-pill);
+  padding:6px 12px;font-size:13px;color:var(--neutral-color-low-medium);
+  background:var(--background-color-lightest);
+}
+.chip-filter i{font-size:13px;cursor:pointer;color:var(--neutral-color-low-light);}
+.lst-body{flex:1;overflow-y:auto;padding:8px 24px 24px;display:flex;flex-direction:column;gap:14px;}
+.lst-body > *{flex-shrink:0;}
+
+.jcard-l{
+  background:var(--background-color-lightest);border-radius:var(--r-lg);
+  box-shadow:var(--shadow);overflow:hidden;
+}
+.jcard-top{display:flex;align-items:center;gap:14px;padding:14px 18px;}
+.avatar-i{
+  width:34px;height:34px;border-radius:var(--r-circ);flex-shrink:0;
+  background:var(--brand-color-primary-lightest);color:var(--brand-color-primary-dark);
+  display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;
+}
+.jcard-name{flex:1;min-width:0;font-size:15px;color:var(--neutral-color-low-pure);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;}
+.jcard-name:hover{color:var(--brand-color-primary-pure);}
+.jcard-acts{display:flex;align-items:center;gap:2px;}
+.jact{position:relative;
+  width:30px;height:30px;border-radius:var(--r-sm);border:none;background:none;
+  color:var(--neutral-color-low-medium);font-size:16px;
+  display:inline-flex;align-items:center;justify-content:center;transition:background .1s,color .1s;
+}
+.jact:hover{background:var(--neutral-color-high-light);color:var(--neutral-color-low-pure);}
+.jact.ia{color:var(--brand-color-primary-pure);}
+.jact.ia:hover{background:var(--brand-color-primary-lightest);}
+.jact.ia .dot{
+  position:absolute;margin:-12px 0 0 12px;width:7px;height:7px;border-radius:var(--r-circ);
+  background:var(--feedback-color-success-pure);border:1.5px solid #fff;
+}
+.jact-sep{width:1px;height:18px;background:var(--neutral-color-high-medium);margin:0 5px;}
+.jcard-meta{
+  display:flex;align-items:center;gap:0;flex-wrap:wrap;
+  border-top:1px solid var(--neutral-color-high-light);padding:11px 18px;
+}
+.jmeta{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--neutral-color-low-medium);flex:1;min-width:170px;}
+.jmeta i{font-size:15px;color:var(--neutral-color-low-light);}
+.jmeta.id{color:var(--neutral-color-low-light);font-size:12px;}
+.badge-ia{
+  display:inline-flex;align-items:center;gap:4px;
+  background:var(--brand-color-primary-lightest);color:var(--brand-color-primary-dark);
+  font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:var(--r-pill);
+}
+.badge-ia i{font-size:11px;}
+
+/* ── EDITOR DA JORNADA ────────────────────────────────────── */
+.jr-wrap{display:flex;flex:1;flex-direction:column;overflow:hidden;}
+.jr-hdr{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 24px;background:var(--background-color-lightest);flex-shrink:0;
+}
+.jr-hdr h3{font-size:19px;font-weight:400;color:var(--neutral-color-low-pure);}
+.jr-hdr .ver{font-size:14px;color:var(--neutral-color-low-medium);}
+.pill-ok{
+  background:var(--feedback-color-success-light);color:var(--feedback-color-success-dark);
+  font-size:12.5px;padding:4px 12px;border-radius:var(--r-pill);
+}
+.jr-hdr-sp{flex:1;}
+.jr-hdr-acts{display:flex;align-items:center;gap:10px;}
+.btn-run{
+  display:inline-flex;align-items:center;gap:7px;height:40px;padding:0 18px;
+  border-radius:var(--r-sm);border:1px solid var(--neutral-color-high-medium);
+  background:var(--background-color-lightest);color:var(--neutral-color-high-dark);
+  font-size:14px;font-weight:500;cursor:default;
+}
+.jr-tabs{
+  display:flex;gap:4px;padding:0 24px;background:var(--background-color-lightest);
+  border-bottom:1px solid var(--neutral-color-high-medium);flex-shrink:0;
+}
+.jr-tab{
+  display:inline-flex;align-items:center;gap:7px;padding:11px 12px;
+  font-size:14px;color:var(--neutral-color-low-light);background:none;border:none;
+  border-bottom:2px solid transparent;transition:color .15s,border-color .15s;
+}
+.jr-tab:hover{color:var(--neutral-color-low-pure);}
+.jr-tab.active{color:var(--neutral-color-low-pure);border-bottom-color:var(--neutral-color-low-pure);}
+.jr-tab.ia.active{color:var(--brand-color-primary-pure);border-bottom-color:var(--brand-color-primary-pure);}
+.jr-tab.ia i{color:var(--brand-color-primary-pure);}
+.jr-body{flex:1;overflow-y:auto;padding:22px 24px 40px;background:var(--background-color-light);}
+.jr-col{max-width:1250px;display:flex;flex-direction:column;gap:22px;}
+.jr-col > *{flex-shrink:0;}
+
+/* cartão de seção do formulário */
+.sec{
+  border:1px solid var(--neutral-color-high-light);border-radius:var(--r-lg);
+  box-shadow:var(--shadow);background:var(--background-color-lightest);
+}
+.sec-hdr{display:flex;align-items:flex-start;gap:14px;padding:20px 24px;}
+.sec-ok{
+  width:26px;height:26px;border-radius:var(--r-circ);flex-shrink:0;margin-top:2px;
+  border:2px solid var(--feedback-color-success-pure);color:var(--feedback-color-success-pure);
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+}
+.sec-ok.off{border-color:var(--neutral-color-high-dark);color:var(--neutral-color-high-dark);}
+.sec-ttl{flex:1;min-width:0;}
+.sec-ttl h4{font-size:19px;font-weight:400;color:var(--neutral-color-low-pure);line-height:1.25;}
+.sec-ttl h4 .req{color:var(--feedback-color-helper-pure);}
+.sec-ttl p{font-size:13.5px;color:var(--neutral-color-low-medium);margin-top:3px;}
+.sec-caret{
+  width:30px;height:30px;border:none;background:none;color:var(--neutral-color-low-medium);
+  font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:transform .18s;
+}
+.sec.closed .sec-caret{transform:rotate(180deg);}
+.sec-body{padding:0 24px 22px;display:flex;flex-direction:column;gap:20px;}
+.sec.closed .sec-body{display:none;}
+
+/* campo com rótulo flutuante */
+.ff{position:relative;}
+.ff > input, .ff > textarea{
+  width:100%;height:54px;border:1px solid var(--neutral-color-high-medium);border-radius:var(--r-md);
+  padding:0 18px;font-size:16px;font-family:inherit;color:var(--neutral-color-low-pure);
+  background:var(--background-color-lightest);outline:none;
+}
+.ff > textarea{height:auto;padding:16px 18px;resize:vertical;line-height:1.5;}
+.ff > input:focus, .ff > textarea:focus{border-color:var(--brand-color-secundary-pure);}
+.ff > label{
+  position:absolute;top:-8px;left:14px;padding:0 6px;background:var(--background-color-lightest);
+  font-size:12.5px;color:var(--neutral-color-low-light);
+}
+.ff-help{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:5px;}
+.ff-help span{font-size:12.5px;color:var(--neutral-color-low-medium);}
+.ff-help .cnt{color:var(--neutral-color-low-light);}
+
+/* opções em pílula (radio) */
+.opts{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.opt{
+  display:inline-flex;align-items:center;gap:10px;
+  height:46px;padding:0 20px;border-radius:var(--r-sm);
+  border:1px solid var(--neutral-color-high-medium);background:var(--background-color-lightest);
+  font-size:15px;color:var(--neutral-color-low-pure);transition:border-color .12s,background .12s;
+}
+.opt:hover{border-color:var(--brand-color-secundary-pure);}
+.opt.on{border-color:var(--brand-color-secundary-pure);background:var(--brand-color-secundary-lightest);}
+.opt .radio{
+  width:18px;height:18px;border-radius:var(--r-circ);flex-shrink:0;
+  border:2px solid var(--neutral-color-high-dark);position:relative;
+}
+.opt.on .radio{border-color:var(--brand-color-primary-pure);}
+.opt.on .radio::after{
+  content:'';position:absolute;inset:3px;border-radius:var(--r-circ);
+  background:var(--brand-color-primary-pure);
+}
+.opt i{font-size:17px;color:var(--neutral-color-low-medium);}
+.opt.on i{color:var(--neutral-color-low-pure);}
+.opt-attached{
+  display:inline-flex;align-items:center;gap:8px;height:46px;padding:0 14px;
+  border:1px solid var(--brand-color-secundary-pure);border-left:none;
+  border-radius:0 var(--r-sm) var(--r-sm) 0;background:var(--background-color-lightest);
+  font-size:14px;color:var(--neutral-color-low-pure);margin-left:-14px;
+}
+.opt-attached i{font-size:14px;color:var(--neutral-color-low-light);}
+.opt.has-attached{border-radius:var(--r-sm) 0 0 var(--r-sm);}
+
+/* canvas do fluxo */
+.canvas{
+  background:var(--brand-color-secundary-lightest);border:1px solid var(--brand-color-secundary-light);
+  border-radius:var(--r-md);height:260px;
+  display:flex;align-items:center;justify-content:center;
+}
+.canvas-node{
+  width:190px;height:74px;border-radius:var(--r-md);
+  border:1px solid var(--neutral-color-high-dark);background:var(--background-color-lightest);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  font-size:12.5px;color:var(--neutral-color-low-medium);
+}
+.canvas-node i{font-size:19px;color:var(--brand-color-primary-pure);}
+
+/* ══ CARTÃO DA IA NA CRIAÇÃO DA JORNADA ══ */
+.sec.ia .sec-ok{border-color:var(--brand-color-primary-pure);color:var(--brand-color-primary-pure);}
+.sec.ia.off .sec-ok{border-color:var(--neutral-color-high-dark);color:var(--neutral-color-high-dark);}
+.ia-switch{
+  display:flex;align-items:center;gap:14px;
+  border:1px solid var(--neutral-color-high-medium);border-radius:var(--r-md);padding:16px 18px;
+}
+.ia-switch.on{border-color:var(--brand-color-primary-pure);background:var(--brand-color-primary-lightest);}
+.ia-switch-body{flex:1;min-width:0;}
+.ia-switch-ttl{font-size:14.5px;font-weight:500;color:var(--neutral-color-low-pure);}
+.ia-switch-sub{font-size:12.5px;color:var(--neutral-color-low-medium);margin-top:3px;line-height:1.5;}
+.ia-conf{display:none;flex-direction:column;gap:16px;}
+.ia-conf.on{display:flex;}
+.ia-sub{
+  border:1px solid var(--neutral-color-high-light);border-radius:var(--r-md);padding:16px 18px;
+  display:flex;flex-direction:column;gap:12px;
+}
+.ia-sub-ttl{font-size:13.5px;font-weight:600;color:var(--neutral-color-low-pure);display:flex;align-items:center;gap:8px;}
+.ia-sub-ttl i{font-size:16px;color:var(--brand-color-primary-pure);}
+.ia-sub-ttl .sp{flex:1;}
+.ia-sub p{font-size:12.5px;color:var(--neutral-color-low-medium);line-height:1.55;}
+
+/* prompts de extração */
+.xp{
+  display:flex;align-items:flex-start;gap:11px;
+  border:1px solid var(--neutral-color-high-light);border-radius:var(--r-sm);padding:11px 13px;
+}
+.xp-ico{
+  width:26px;height:26px;border-radius:var(--r-sm);flex-shrink:0;
+  background:var(--brand-color-primary-lightest);color:var(--brand-color-primary-pure);
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+}
+.xp-body{flex:1;min-width:0;}
+.xp-prompt{font-size:13px;color:var(--neutral-color-low-pure);line-height:1.5;}
+.xp-target{display:flex;align-items:center;gap:7px;margin-top:7px;flex-wrap:wrap;}
+.code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;
+  background:var(--brand-color-secundary-lightest);color:var(--brand-color-secundary-dark);
+  border-radius:var(--r-sm);padding:3px 8px;
+}
+.ai-src{
+  display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;
+  background:var(--brand-color-primary-lightest);color:var(--brand-color-primary-dark);
+  border-radius:var(--r-pill);padding:2px 8px;white-space:nowrap;
+}
+.ai-src i{font-size:11px;}
+
+/* ── Seleção das análises padrão ── */
+.an-opt{
+  display:flex;align-items:flex-start;gap:12px;
+  border:1px solid var(--neutral-color-high-light);border-radius:var(--r-sm);
+  padding:12px 14px;cursor:pointer;transition:border-color .12s,background .1s;
+}
+.an-opt:hover{border-color:var(--brand-color-primary-light);}
+.an-opt.on{border-color:var(--brand-color-primary-pure);background:var(--brand-color-primary-lightest);}
+.an-check{
+  width:19px;height:19px;border-radius:5px;flex-shrink:0;margin-top:1px;
+  border:2px solid var(--neutral-color-high-dark);background:var(--background-color-lightest);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;
+  transition:background .12s,border-color .12s;
+}
+.an-check i{opacity:0;}
+.an-opt.on .an-check{background:var(--brand-color-primary-pure);border-color:var(--brand-color-primary-pure);}
+.an-opt.on .an-check i{opacity:1;}
+.an-opt-body{flex:1;min-width:0;}
+.an-opt-ttl{font-size:13.5px;font-weight:500;color:var(--neutral-color-low-pure);}
+.an-opt-sub{font-size:12px;color:var(--neutral-color-low-medium);margin-top:3px;line-height:1.5;}
+.an-opt.fixed{cursor:default;opacity:.85;}
+.an-opt.fixed:hover{border-color:var(--neutral-color-high-light);}
+.an-lock{font-size:11px;color:var(--neutral-color-low-light);display:inline-flex;align-items:center;gap:4px;}
+
+/* ── Análises personalizadas (cenários) ── */
+.learn{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:13px;color:var(--feedback-color-helper-pure);cursor:pointer;
+}
+.learn i{font-size:14px;}
+.scn{
+  border:1px solid var(--neutral-color-high-light);border-radius:var(--r-md);
+  background:var(--background-color-lightest);overflow:hidden;
+}
+.scn.on{border-color:var(--brand-color-primary-light);}
+.scn-hdr{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;}
+.scn-hdr:hover{background:#fafbfb;}
+.scn-ok{
+  width:24px;height:24px;border-radius:var(--r-circ);flex-shrink:0;
+  border:2px solid var(--neutral-color-high-dark);color:var(--neutral-color-high-dark);
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+}
+.scn.on .scn-ok{border-color:var(--feedback-color-success-pure);color:var(--feedback-color-success-pure);}
+.scn-name{flex:1;min-width:0;font-size:15px;color:var(--neutral-color-low-pure);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.scn-name .pre{color:var(--neutral-color-low-light);}
+.scn-name .scn-noname{color:var(--neutral-color-high-dark);font-style:italic;}
+.scn-caret{font-size:15px;color:var(--neutral-color-low-light);transition:transform .15s;}
+.scn.open .scn-caret{transform:rotate(180deg);}
+.scn-body{display:none;padding:0 16px 18px;flex-direction:column;gap:18px;}
+.scn.open .scn-body{display:flex;}
+.scn-field{display:flex;flex-direction:column;gap:4px;}
+.scn-lbl{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--neutral-color-low-pure);}
+.scn-lbl .req{color:var(--feedback-color-helper-pure);}
+.scn-help{font-size:13px;color:var(--neutral-color-low-medium);margin-bottom:6px;}
+.scn-field input, .scn-field textarea{
+  width:100%;border:1px solid var(--neutral-color-high-medium);border-radius:var(--r-md);
+  padding:13px 16px;font-size:15px;font-family:inherit;color:var(--neutral-color-low-pure);
+  background:var(--background-color-lightest);outline:none;line-height:1.5;
+}
+.scn-field textarea{min-height:96px;resize:vertical;}
+.scn-field input:focus, .scn-field textarea:focus{border-color:var(--brand-color-secundary-pure);}
+.scn-field input::placeholder, .scn-field textarea::placeholder{color:var(--neutral-color-high-dark);}
+.btn-add{
+  display:inline-flex;align-items:center;gap:10px;align-self:flex-start;
+  height:44px;padding:0 20px 0 14px;border:none;border-radius:var(--r-pill);
+  background:var(--brand-color-primary-light);color:var(--brand-color-primary-dark);
+  font-size:15px;font-weight:500;transition:background .12s;
+}
+.btn-add:hover{background:var(--brand-color-primary-lightest);}
+.btn-add i{font-size:20px;}
+
+/* resultado de cenário no relatório */
+.scn-res{
+  display:flex;gap:12px;padding:13px;
+  border:1px solid var(--neutral-color-high-light);border-radius:var(--r-sm);
+}
+.scn-res-ico{
+  width:28px;height:28px;border-radius:var(--r-sm);flex-shrink:0;
+  background:var(--brand-color-primary-lightest);color:var(--brand-color-primary-pure);
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+}
+.scn-res-b{flex:1;min-width:0;}
+.scn-res-t{font-size:13px;color:var(--neutral-color-low-pure);line-height:1.55;}
+.scn-pending{
+  display:flex;align-items:center;gap:9px;font-size:12.5px;
+  color:var(--feedback-color-helper-dark);background:var(--feedback-color-helper-light);
+  border-radius:var(--r-sm);padding:10px 12px;line-height:1.5;
+}
+.scn-pending i{font-size:15px;flex-shrink:0;color:var(--feedback-color-helper-pure);}
+
+/* ── Layout em duas colunas: rail de análises + relatório ── */
+.jr-body.split{overflow:hidden;padding:0;display:flex;flex-direction:column;}
+.ia-rail-new{
+  padding:16px;border-bottom:1px solid var(--neutral-color-high-light);
+  flex-shrink:0;display:flex;flex-direction:column;gap:10px;
+}
+.ia-rail-lbl{
+  font-size:11px;font-weight:700;color:var(--neutral-color-low-light);
+  text-transform:uppercase;letter-spacing:.05em;
+}
+.ia-rail-new .per{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.ia-rail-new .per-btn{padding:0 4px;font-size:11.5px;height:30px;}
+.ia-rail-dates{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ia-rail-dates label{
+  font-size:10px;font-weight:600;color:var(--neutral-color-low-light);
+  text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:3px;
+}
+.ia-rail-dates input{
+  width:100%;height:32px;border:1px solid var(--neutral-color-high-medium);
+  border-radius:var(--r-sm);padding:0 7px;font-size:12px;font-family:inherit;
+  color:var(--neutral-color-low-pure);outline:none;
+}
+.ia-rail-dates input:focus{border-color:var(--brand-color-secundary-pure);}
+.ia-rail-new .range-msg{font-size:11.5px;}
+.ia-rail-new .btn{width:100%;justify-content:center;}
+.ia-cols{flex:1;display:flex;overflow:hidden;min-height:0;}
+.ia-rail{
+  width:300px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;
+  border-right:1px solid var(--neutral-color-high-medium);
+  background:var(--background-color-lightest);
+}
+.ia-rail-hdr{padding:16px 16px 12px;flex-shrink:0;}
+.ia-rail-hdr h4{font-size:14px;font-weight:600;color:var(--neutral-color-low-pure);
+  display:flex;align-items:center;gap:8px;}
+.ia-rail-hdr h4 .n{
+  background:var(--neutral-color-high-light);color:var(--neutral-color-low-medium);
+  border-radius:var(--r-pill);padding:1px 7px;font-size:10.5px;font-weight:600;
+}
+.ia-rail-hdr p{font-size:11.5px;color:var(--neutral-color-low-light);margin-top:4px;line-height:1.45;}
+.ia-rail-filters{padding:0 16px 12px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
+/* .inp-search do DS usa flex-basis 220px — em coluna isso vira altura */
+.ia-rail-filters .inp-search{flex:0 0 auto;}
+.ia-rail-filters .inp-search input{height:34px;font-size:12.5px;}
+.ia-rail-filters .two{display:flex;gap:8px;}
+.ia-rail-filters .sel-filter{flex:1;}
+.ia-rail-filters .sel-filter select{height:34px;font-size:12.5px;padding:0 24px 0 10px;}
+.ia-rail-list{flex:1;overflow-y:auto;padding:0 12px 16px;display:flex;flex-direction:column;gap:14px;}
+.ia-rail-group{display:flex;flex-direction:column;gap:6px;}
+
+/* linha compacta do rail */
+.ra{
+  border:1px solid var(--neutral-color-high-light);border-radius:var(--r-md);
+  padding:10px 12px;cursor:pointer;transition:border-color .12s,background .1s;
+  display:flex;flex-direction:column;gap:5px;
+}
+.ra:hover{border-color:var(--brand-color-primary-light);background:#fafbfb;}
+.ra.current{border-color:var(--brand-color-primary-pure);background:var(--brand-color-primary-lightest);}
+.ra-top{display:flex;align-items:center;gap:8px;}
+.ra-per{flex:1;min-width:0;font-size:12.5px;font-weight:500;color:var(--neutral-color-low-pure);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ra-dot{width:7px;height:7px;border-radius:var(--r-circ);flex-shrink:0;}
+.ra-dot.ok{background:var(--feedback-color-success-pure);}
+.ra-dot.err{background:var(--feedback-color-warning-pure);}
+.ra-dot.proc{background:var(--brand-color-secundary-pure);animation:pulse 1.2s infinite;}
+.ra-meta{font-size:10.5px;color:var(--neutral-color-low-light);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.ra-meta i{font-size:11px;}
+.ra-retry{font-size:10.5px;color:var(--feedback-color-warning-dark);display:inline-flex;align-items:center;gap:4px;}
+
+/* coluna do relatório */
+.ia-report-col{flex:1;min-width:0;overflow-y:auto;padding:0 24px 40px;display:flex;flex-direction:column;gap:16px;}
+.ia-report-col > *{flex-shrink:0;}
+.rep-sticky{
+  position:sticky;top:0;z-index:5;margin:0 -24px;padding:14px 24px;
+  background:var(--background-color-light);
+  border-bottom:1px solid var(--neutral-color-high-medium);
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.rep-sticky-t{flex:1;min-width:0;}
+.rep-sticky-p{font-size:14px;font-weight:600;color:var(--neutral-color-low-pure);}
+.rep-sticky-m{font-size:11.5px;color:var(--neutral-color-low-light);margin-top:2px;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.rep-sticky-m .sep{width:3px;height:3px;border-radius:var(--r-circ);background:var(--neutral-color-high-dark);}
+
+@media (max-width:1180px){ .ia-rail{width:250px;} }
+
+/* ── Histórico de análises ── */
+.hist-more{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:11px;border:1px dashed var(--neutral-color-high-dark);
+  border-radius:var(--r-md);background:none;
+  font-size:12.5px;color:var(--neutral-color-low-medium);transition:all .12s;
+}
+.hist-more:hover{border-color:var(--brand-color-primary-pure);color:var(--brand-color-primary-pure);}
+.hist-more i{font-size:14px;}
+.hist-bar{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:14px 28px;border-bottom:1px solid var(--neutral-color-high-light);flex-shrink:0;
+}
+.hist-bar .inp-search{flex:1;min-width:180px;}
+.hist-bar .sel-filter{flex:0 0 160px;}
+.hist-count{font-size:11.5px;color:var(--neutral-color-low-light);width:100%;}
+.hist-group{
+  font-size:11px;font-weight:700;color:var(--neutral-color-low-light);
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px;
+  display:flex;align-items:center;gap:8px;
+}
+.hist-group span{
+  background:var(--neutral-color-high-light);color:var(--neutral-color-low-medium);
+  border-radius:var(--r-pill);padding:1px 7px;font-size:10.5px;letter-spacing:0;
+}
+
+/* ── Faixa de validação (andaime do protótipo) ── */
+.modo-pill{
+  position:fixed;left:16px;bottom:16px;z-index:900;
+  display:flex;align-items:center;gap:9px;
+  background:rgba(40,41,61,.92);color:#fff;
+  border-radius:var(--r-pill);padding:8px 14px;
+  font-size:11.5px;font-weight:500;
+  box-shadow:0 4px 16px rgba(40,41,61,.28);
+}
+.modo-pill .dot{width:8px;height:8px;border-radius:var(--r-circ);
+  background:var(--neutral-color-high-dark);flex-shrink:0;}
+.modo-pill .dot.full{background:var(--brand-color-gradient);}
+.modo-pill a{
+  color:#fff;opacity:.72;text-decoration:underline;text-underline-offset:2px;
+  padding-left:9px;margin-left:2px;border-left:1px solid rgba(255,255,255,.2);
+}
+.modo-pill a:hover{opacity:1;}
+
+/* ── Modal de prompt de extração (mesmo da proposta A) ── */
+.modal.lg{width:560px;max-width:92vw;}
+.ia-form{display:flex;flex-direction:column;gap:14px;margin-top:6px;}
+
+/* ── Detalhamento em modal (todos os cards do relatório) ── */
+.det-btn{
+  width:30px;height:30px;border-radius:var(--r-sm);border:none;background:none;flex-shrink:0;
+  color:var(--neutral-color-low-light);font-size:16px;
+  display:inline-flex;align-items:center;justify-content:center;transition:background .1s,color .1s;
+}
+.det-btn:hover{background:var(--brand-color-primary-lightest);color:var(--brand-color-primary-pure);}
+.modal.det{width:720px;display:flex;flex-direction:column;max-height:86vh;}
+.det-hdr{padding:24px 28px 16px;border-bottom:1px solid var(--neutral-color-high-light);flex-shrink:0;}
+.det-top{display:flex;align-items:flex-start;gap:14px;}
+.det-top h4{flex:1;min-width:0;font-size:19px;font-weight:500;color:var(--neutral-color-low-pure);line-height:1.3;}
+.det-kind{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--brand-color-primary-lightest);color:var(--brand-color-primary-dark);
+  font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:var(--r-pill);
+  text-transform:uppercase;letter-spacing:.04em;margin-bottom:9px;
+}
+.det-kind i{font-size:12px;}
+.det-body{padding:20px 28px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:20px;}
+.det-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.det-m{background:var(--background-color-light);border-radius:var(--r-md);padding:11px 13px;}
+.det-m-l{font-size:10.5px;color:var(--neutral-color-low-light);line-height:1.3;}
+.det-m-v{font-size:18px;font-weight:600;color:var(--neutral-color-low-pure);margin-top:3px;line-height:1.1;}
+.det-m-h{font-size:10.5px;color:var(--neutral-color-low-light);margin-top:2px;}
+.det-sec-t{
+  font-size:11px;font-weight:700;color:var(--neutral-color-low-light);
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px;
+}
+.det-line{display:flex;align-items:center;gap:12px;padding:8px 0;}
+.det-line + .det-line{border-top:1px solid var(--neutral-color-high-light);}
+.det-line-m{flex:1;min-width:0;}
+.det-line-t{font-size:13px;color:var(--neutral-color-low-pure);}
+.det-line-v{font-size:13px;font-weight:600;color:var(--neutral-color-low-pure);min-width:64px;text-align:right;}
+.det-split{display:flex;gap:10px;flex-wrap:wrap;}
+.det-half{
+  flex:1;min-width:190px;background:var(--background-color-light);
+  border-radius:var(--r-md);padding:2px 14px;
+}
+.det-half .det-line{border-top:none;}
+.det-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.det-tag{
+  background:var(--background-color-light);border:1px solid var(--neutral-color-high-medium);
+  border-radius:var(--r-pill);padding:4px 11px;font-size:12px;color:var(--neutral-color-low-medium);
+}
+.modal.det .modal-ftr{padding:14px 28px 20px;border-top:1px solid var(--neutral-color-high-light);flex-shrink:0;justify-content:space-between;}
+.det-ftr-note{font-size:11.5px;color:var(--neutral-color-low-light);}
+
+/* ══ ABA IA PANORÂMICA ══════════════════════════════════════ */
+.per{display:flex;gap:6px;flex-wrap:wrap;}
+.per-btn{
+  height:32px;padding:0 12px;border-radius:var(--r-pill);
+  border:1px solid var(--neutral-color-high-medium);background:var(--background-color-lightest);
+  font-size:12.5px;color:var(--neutral-color-low-medium);transition:all .12s;
+}
+.per-btn:hover{border-color:var(--brand-color-primary-pure);color:var(--brand-color-primary-pure);}
+.per-btn.on{border-color:var(--brand-color-primary-pure);background:var(--brand-color-primary-lightest);color:var(--brand-color-primary-dark);font-weight:500;}
+.per-dates{display:flex;gap:8px;align-items:center;}
+.per-dates input{
+  height:32px;border:1px solid var(--neutral-color-high-medium);border-radius:var(--r-sm);
+  padding:0 9px;font-size:12.5px;font-family:inherit;color:var(--neutral-color-low-pure);outline:none;
+}
+.per-dates input:focus{border-color:var(--brand-color-secundary-pure);}
+.range-msg{font-size:12.5px;color:var(--neutral-color-low-medium);line-height:1.5;width:100%;}
+.range-msg.err{color:var(--feedback-color-warning-dark);background:var(--feedback-color-warning-light);border-radius:var(--r-sm);padding:8px 11px;}
+.range-msg.warn{color:var(--feedback-color-helper-dark);background:var(--feedback-color-helper-light);border-radius:var(--r-sm);padding:8px 11px;}
+
+.an-row{
+  display:flex;align-items:center;gap:12px;padding:12px 14px;
+  border:1px solid var(--neutral-color-high-light);border-radius:var(--r-md);
+  cursor:pointer;transition:border-color .12s,background .1s;
+}
+.an-row:hover{border-color:var(--brand-color-primary-light);background:#fafbfb;}
+.an-row.current{border-color:var(--brand-color-primary-pure);background:var(--brand-color-primary-lightest);}
+.an-main{flex:1;min-width:0;}
+.an-per{font-size:13.5px;font-weight:500;color:var(--neutral-color-low-pure);}
+.an-meta{font-size:11.5px;color:var(--neutral-color-low-light);margin-top:3px;display:flex;gap:9px;flex-wrap:wrap;align-items:center;}
+.an-meta .sep{width:3px;height:3px;border-radius:var(--r-circ);background:var(--neutral-color-high-dark);}
+.b-proc{background:var(--brand-color-secundary-lightest);color:var(--brand-color-secundary-dark);}
+.b-proc::before{background:var(--brand-color-secundary-pure);animation:pulse 1.2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+.src-list{display:flex;flex-direction:column;gap:8px;}
+.src{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--neutral-color-low-light);}
+.src i{font-size:15px;}
+.src .spin{animation:spin 1s linear infinite;color:var(--brand-color-primary-pure);}
+@keyframes spin{to{transform:rotate(360deg)}}
+.src.done{color:var(--neutral-color-low-medium);}
+.src.done i{color:var(--feedback-color-success-pure);}
+.src.skip i{color:var(--neutral-color-high-dark);}
+
+/* relatório */
+.rep-hero{border-radius:var(--r-lg);padding:2px;background:var(--brand-color-gradient);}
+.rep-hero-in{background:var(--background-color-lightest);border-radius:14px;padding:18px 20px;}
+.rep-hero-top{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+.rep-hero-top i{font-size:18px;color:var(--brand-color-primary-pure);}
+.rep-hero-top h5{font-size:14px;font-weight:600;color:var(--neutral-color-low-pure);}
+.rep-hero-in p{font-size:13.5px;line-height:1.65;color:var(--neutral-color-low-medium);}
+.cov{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.cov-i{background:var(--background-color-light);border-radius:var(--r-md);padding:12px 14px;}
+.cov-l{font-size:11px;color:var(--neutral-color-low-light);display:flex;align-items:center;gap:5px;}
+.cov-v{font-size:19px;font-weight:600;color:var(--neutral-color-low-pure);margin-top:4px;line-height:1.1;}
+.cov-h{font-size:11px;color:var(--neutral-color-low-light);margin-top:3px;}
+.row{border:1px solid var(--neutral-color-high-light);border-radius:var(--r-md);overflow:hidden;}
+.row-hdr{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;transition:background .1s;}
+.row-hdr:hover{background:#fafbfb;}
+.row-main{flex:1;min-width:0;}
+.row-ttl{font-size:13.5px;font-weight:500;color:var(--neutral-color-low-pure);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.row-meta{font-size:11.5px;color:var(--neutral-color-low-light);margin-top:3px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.row-meta .sep{width:3px;height:3px;border-radius:var(--r-circ);background:var(--neutral-color-high-dark);}
+.row-val{font-size:15px;font-weight:600;color:var(--neutral-color-low-pure);min-width:44px;text-align:right;}
+.row-caret{font-size:14px;color:var(--neutral-color-low-light);transition:transform .15s;}
+.row.open .row-caret{transform:rotate(180deg);}
+.row-body{display:none;padding:0 14px 14px;border-top:1px solid var(--neutral-color-high-light);}
+.row.open .row-body{display:block;}
+.bar{height:5px;border-radius:3px;background:var(--neutral-color-high-light);overflow:hidden;margin-top:7px;}
+.bar > span{display:block;height:100%;border-radius:3px;background:var(--brand-color-primary-pure);}
+.bar.ok > span{background:var(--feedback-color-success-pure);}
+.bar.warn > span{background:var(--feedback-color-helper-pure);}
+.bar.err > span{background:var(--feedback-color-warning-pure);}
+.lbl{font-size:11px;font-weight:700;color:var(--neutral-color-low-light);text-transform:uppercase;letter-spacing:.05em;margin-top:12px;}
+.quote{
+  background:var(--background-color-light);border-left:3px solid var(--neutral-color-high-dark);
+  border-radius:0 var(--r-sm) var(--r-sm) 0;padding:9px 12px;margin-top:8px;
+  font-size:12.5px;color:var(--neutral-color-low-medium);line-height:1.5;font-style:italic;
+}
+.quote .src-l{display:block;font-style:normal;font-size:10.5px;color:var(--neutral-color-low-light);margin-top:5px;}
+.seal{
+  display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;
+  padding:2px 8px;border-radius:var(--r-pill);
+  background:var(--brand-color-secundary-lightest);color:var(--brand-color-secundary-dark);
+}
+.seal i{font-size:12px;}
+.seal.none{background:var(--neutral-color-high-light);color:var(--neutral-color-low-light);}
+.seal.gap{background:var(--feedback-color-helper-light);color:var(--feedback-color-helper-dark);}
+.outs{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.out{flex:1;min-width:110px;background:var(--background-color-light);border-radius:var(--r-sm);padding:8px 10px;}
+.out-l{font-size:10.5px;color:var(--neutral-color-low-light);}
+.out-v{font-size:14px;font-weight:600;color:var(--neutral-color-low-pure);margin-top:2px;}
+.sugg{display:flex;gap:12px;padding:14px;border:1px solid var(--neutral-color-high-light);border-radius:var(--r-md);}
+.sugg-ico{
+  width:30px;height:30px;border-radius:var(--r-sm);flex-shrink:0;
+  background:var(--brand-color-primary-lightest);color:var(--brand-color-primary-pure);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.sugg-t{font-size:13.5px;font-weight:500;color:var(--neutral-color-low-pure);}
+.sugg-d{font-size:12.5px;color:var(--neutral-color-low-medium);line-height:1.55;margin-top:4px;}
+.node{
+  display:inline-flex;align-items:center;gap:5px;margin-top:8px;
+  background:var(--background-color-light);border:1px solid var(--neutral-color-high-medium);
+  border-radius:var(--r-sm);padding:4px 9px;font-size:11.5px;color:var(--neutral-color-low-medium);
+}
+.node i{font-size:13px;color:var(--brand-color-secundary-pure);}
+.node.go{cursor:pointer;}
+.node.go:hover{border-color:var(--brand-color-primary-pure);color:var(--brand-color-primary-pure);}
+
+/* prompt */
+.chat{display:flex;flex-direction:column;gap:12px;}
+.msg{display:flex;gap:10px;max-width:88%;}
+.msg.me{align-self:flex-end;flex-direction:row-reverse;}
+.msg-av{
+  width:28px;height:28px;border-radius:var(--r-circ);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;
+  background:var(--brand-color-gradient);
+}
+.msg.me .msg-av{background:var(--neutral-color-high-light);color:var(--neutral-color-low-medium);font-size:11px;font-weight:600;}
+.bub{background:var(--background-color-light);border-radius:var(--r-md);padding:10px 13px;font-size:13px;line-height:1.6;color:var(--neutral-color-low-pure);}
+.msg.me .bub{background:var(--brand-color-primary-lightest);color:var(--brand-color-primary-dark);}
+.bub ul{margin:7px 0 0;padding-left:16px;display:flex;flex-direction:column;gap:4px;}
+.bub li{font-size:12.5px;line-height:1.5;}
+.msg-t{font-size:10.5px;color:var(--neutral-color-low-light);margin-top:5px;}
+.typing{display:flex;gap:4px;align-items:center;padding:3px 0;}
+.typing span{width:6px;height:6px;border-radius:var(--r-circ);background:var(--neutral-color-high-dark);animation:blink 1s infinite;}
+.typing span:nth-child(2){animation-delay:.15s;}
+.typing span:nth-child(3){animation-delay:.3s;}
+@keyframes blink{0%,60%,100%{opacity:.3}30%{opacity:1}}
+.ask{display:flex;gap:8px;align-items:flex-end;}
+.ask textarea{
+  flex:1;min-height:40px;max-height:120px;resize:none;
+  border:1px solid var(--neutral-color-high-medium);border-radius:var(--r-md);
+  padding:11px 12px;font-size:13px;font-family:inherit;color:var(--neutral-color-low-pure);
+  outline:none;line-height:1.4;
+}
+.ask textarea:focus{border-color:var(--brand-color-secundary-pure);}
+.chips{display:flex;gap:6px;flex-wrap:wrap;}
+.chip{
+  background:var(--background-color-lightest);border:1px solid var(--neutral-color-high-medium);
+  border-radius:var(--r-pill);padding:5px 11px;font-size:11.5px;color:var(--neutral-color-low-medium);
+  cursor:pointer;transition:border-color .12s,color .12s;
+}
+.chip:hover{border-color:var(--brand-color-primary-pure);color:var(--brand-color-primary-pure);}
+
+.empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:48px 20px;text-align:center;}
+.empty i{font-size:34px;color:var(--neutral-color-high-dark);}
+.empty h5{font-size:14px;font-weight:600;color:var(--neutral-color-low-medium);}
+.empty p{font-size:12.5px;color:var(--neutral-color-low-light);max-width:360px;}
+
+@media (max-width:1100px){
+  .cov{grid-template-columns:repeat(2,1fr);}
+}}
+</style>
+</head>
+<body>
+<!-- ══════════════════════════════════════════════════════════════
+     IA PANORÂMICA (CCM-3269) — PROPOSTA C
+     A IA é uma configuração da jornada, habilitada na criação,
+     e a análise vira uma aba da própria jornada.
+     ══════════════════════════════════════════════════════════════ -->
+<div class="app">
+
+  <!-- ══ HEADER (shared) ══ -->
+  <header class="hdr">
+    <div class="hdr-brand">
+      <a href="#" class="hdr-logo" onclick="showList();return false;"><img src="vonex_ai.svg" alt="" height="14"></a>
+      <nav class="hdr-nav">
+        <a href="#" class="hdr-nav-item">Campanha <i class="ph ph-caret-down"></i></a>
+        <a href="#" class="hdr-nav-item">Chat <span class="nav-badge">2</span></a>
+        <a href="#" class="hdr-nav-item active" onclick="showList();return false;">Jornada <i class="ph ph-caret-down"></i></a>
+        <a href="#" class="hdr-nav-item">Relatórios <i class="ph ph-caret-down"></i></a>
+        <a href="#" class="hdr-nav-item">Monitoramentos <i class="ph ph-caret-down"></i></a>
+      </nav>
+    </div>
+    <div class="hdr-right">
+      <button class="hdr-plus" title="Criar novo"><i class="ph ph-plus"></i></button>
+      <button class="hdr-icon" title="Notificações"><i class="ph ph-tray"></i><span class="pip">65</span></button>
+      <button class="hdr-icon" title="Ajuda"><i class="ph ph-question"></i></button>
+      <button class="hdr-icon" title="Configurações"><i class="ph ph-gear"></i></button>
+      <div class="hdr-avatar" title="Minha conta">SS</div>
+    </div>
+  </header>
+
+  <div class="app-body">
+    <div id="views" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+
+      <!-- ══════════ VIEW: LISTAGEM DE JORNADAS ══════════ -->
+      <!-- ANGULAR: JourneyListComponent — src/app/@modules/journey/components/journey-list/ -->
+      <div id="v-list" style="flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--background-color-light)">
+
+        <div class="pg-hdr" style="padding-bottom:0;border-bottom:none">
+          <div class="lhdr">
+            <div class="lhdr-title">
+              <h3>Jornada</h3>
+              <p>Projete as jornadas receptivas e ativas dos seus contatos</p>
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-sec btn-lg">Monitoramento geral</button>
+              <button class="btn btn-prim btn-lg" onclick="openJourney('new')">Nova jornada</button>
+            </div>
+          </div>
+        </div>
+        <div class="lst-bar">
+          <div class="lst-search">
+            <i class="ph ph-magnifying-glass"></i>
+            <input type="text" id="lstSearch" placeholder="Pesquisar" oninput="renderList()">
+          </div>
+          <button class="lst-adv"><i class="ph ph-funnel"></i> Filtros avançados</button>
+          <button class="lst-kebab"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+
+        <div class="lst-filters">
+          <span class="chip-filter">Ativo, Pausada, Cancelado, Aguardando ativação <i class="ph ph-x"></i></span>
+        </div>
+
+        <div class="lst-body" id="lstBody"></div>
+      </div>
+
+      <!-- ══════════ VIEW: JORNADA ══════════ -->
+      <!-- ANGULAR: JourneyDetailComponent — src/app/@modules/journey/components/journey-detail/ -->
+      <div id="v-journey" class="jr-wrap" style="display:none;">
+
+        <div class="jr-hdr">
+          <button class="back-btn" onclick="showList()" title="Voltar"><i class="ph ph-arrow-left"></i></button>
+          <h3>Jornada</h3>
+          <span class="pill-ok" id="jrStatus">Ativo</span>
+          <span class="ver" id="jrVersion">Versão - 005</span>
+          <span class="pill-ok" id="jrInUse">Em uso</span>
+          <span class="jr-hdr-sp"></span>
+          <div class="jr-hdr-acts">
+            <button class="hdr-icon" title="Documentação"><i class="ph ph-notebook"></i></button>
+            <button class="btn btn-prim btn-lg" onclick="saveJourney()">
+              <i class="ph ph-floppy-disk"></i> Salvar jornada
+            </button>
+            <button class="btn-run"><i class="ph ph-play"></i> Executar jornada</button>
+          </div>
+        </div>
+
+        <!-- A aba da IA só existe quando a análise foi habilitada na jornada -->
+        <div class="jr-tabs">
+          <button class="jr-tab active" id="tab-dados" onclick="jrTab('dados')">Dados da jornada</button>
+          <button class="jr-tab" id="tab-mon"   onclick="jrTab('mon')">Monitoramento</button>
+          <button class="jr-tab" id="tab-prev"  onclick="jrTab('prev')">Prévia de testes</button>
+          <button class="jr-tab ia" id="tab-ia" onclick="jrTab('ia')" style="display:none">
+            <i class="ph ph-sparkle"></i> IA Panorâmica
+          </button>
+        </div>
+
+        <!-- ── ABA: DADOS DA JORNADA ── -->
+        <div class="jr-body" id="pane-dados">
+          <div class="jr-col">
+
+            <div class="sec">
+              <div class="sec-hdr">
+                <span class="sec-ok"><i class="ph ph-check"></i></span>
+                <div class="sec-ttl"><h4>Configurações</h4><p>Configurações gerais</p></div>
+                <button class="sec-caret" onclick="secToggle(this)"><i class="ph ph-caret-up"></i></button>
+              </div>
+              <div class="sec-body">
+                <div>
+                  <div class="ff">
+                    <label>Nome da jornada</label>
+                    <input type="text" id="jrName" value="3150" oninput="renderJourneyHeader()">
+                  </div>
+                  <div class="ff-help"><span>Obrigatório*</span><span class="cnt">46</span></div>
+                </div>
+                <div>
+                  <div class="ff">
+                    <label>Descrição</label>
+                    <input type="text" id="jrDesc" value="3150">
+                  </div>
+                  <div class="ff-help"><span></span><span class="cnt">246</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="sec">
+              <div class="sec-hdr">
+                <span class="sec-ok"><i class="ph ph-check"></i></span>
+                <div class="sec-ttl"><h4>Tipo de jornada<span class="req">*</span></h4><p>Defina o gatilho que iniciará as configurações</p></div>
+                <button class="sec-caret" onclick="secToggle(this)"><i class="ph ph-caret-up"></i></button>
+              </div>
+              <div class="sec-body">
+                <div class="opts">
+                  <button class="opt on" onclick="pickOpt(this)"><span class="radio"></span> Receptivo</button>
+                  <button class="opt" onclick="pickOpt(this)"><span class="radio"></span> Ativo</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="sec">
+              <div class="sec-hdr">
+                <span class="sec-ok"><i class="ph ph-check"></i></span>
+                <div class="sec-ttl"><h4>Canal<span class="req">*</span></h4><p>Selecione o canal</p></div>
+                <button class="sec-caret" onclick="secToggle(this)"><i class="ph ph-caret-up"></i></button>
+              </div>
+              <div class="sec-body">
+                <div class="opts">
+                  <button class="opt" onclick="pickOpt(this)"><span class="radio"></span> <i class="ph ph-whatsapp-logo"></i> WhatsApp</button>
+                  <button class="opt" onclick="pickOpt(this)"><span class="radio"></span> <i class="ph ph-phone-call"></i> A.I. Voice</button>
+                  <span style="display:inline-flex;align-items:center">
+                    <button class="opt on has-attached" onclick="pickOpt(this)"><span class="radio"></span> <i class="ph ph-envelope-simple"></i> E-mail</button>
+                    <span class="opt-attached">bruna &nbsp;· R$ 0,00 <i class="ph ph-caret-down"></i></span>
+                  </span>
+                  <button class="opt" onclick="pickOpt(this)"><span class="radio"></span> <i class="ph ph-monitor"></i> WhatsApp Web</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ══ NOVO: IA PANORÂMICA COMO CONFIGURAÇÃO DA JORNADA ══ -->
+            <!-- ANGULAR: <app-journey-panoramic-config formGroupName="panoramicAi"> -->
+            <div class="sec ia off" id="secIa">
+              <div class="sec-hdr">
+                <span class="sec-ok"><i class="ph ph-sparkle"></i></span>
+                <div class="sec-ttl">
+                  <h4>IA Panorâmica</h4>
+                  <p>Análise da jornada, das conversas e dos atendimentos pela IA da Vonex</p>
+                </div>
+                <button class="sec-caret" onclick="secToggle(this)"><i class="ph ph-caret-up"></i></button>
+              </div>
+              <div class="sec-body">
+
+                <div class="ia-switch" id="iaSwitch">
+                  <span class="toggle" id="iaToggle" onclick="toggleIa()"></span>
+                  <div class="ia-switch-body">
+                    <div class="ia-switch-ttl">Usar a IA Panorâmica nesta jornada</div>
+                    <div class="ia-switch-sub">
+                      Habilita a aba <strong>IA Panorâmica</strong> na jornada, com as perguntas mais frequentes
+                      dos contatos, os argumentos dos atendentes e sugestões de melhoria no fluxo.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="ia-conf" id="iaConf">
+
+                  <div class="info-banner">
+                    <i class="ph ph-info"></i>
+                    <span>Cada análise cobre esta jornada em um período de até 30 dias. A geração roda em segundo plano e você é notificado ao término.</span>
+                  </div>
+
+                  <!-- ══ Quais análises padrão a IA deve produzir ══ -->
+                  <!-- ANGULAR: formArray de blocos padrão do relatório -->
+                  <div class="ia-sub">
+                    <div class="ia-sub-ttl">
+                      <i class="ph ph-list-checks"></i> O que a IA deve analisar
+                    </div>
+                    <p>Selecione as análises padrão que entram no relatório desta jornada.</p>
+                    <div id="blockList" style="display:flex;flex-direction:column;gap:8px"></div>
+                  </div>
+
+                  <!-- ══ Análises personalizadas (cenários) — só na versão completa ══ -->
+                  <!-- ANGULAR: formArray de cenários — nome + descrição para a IA -->
+                  <div class="ia-sub" id="subScenarios">
+                    <div class="ia-sub-ttl">
+                      <i class="ph ph-magic-wand"></i> Análises personalizadas
+                    </div>
+                    <p>
+                      Além das análises padrão, descreva o que mais a IA deve procurar nas conversas
+                      desta jornada. Cada análise recebe um nome e uma descrição objetiva do que a IA
+                      deve identificar, e vira um bloco próprio no relatório.
+                    </p>
+                    <div id="scnList" style="display:flex;flex-direction:column;gap:10px"></div>
+                    <button class="btn-add" onclick="addScenario()">
+                      <i class="ph ph-plus-circle"></i> Adicionar análise
+                    </button>
+                  </div>
+
+                  <div class="ia-sub">
+                    <div class="ia-sub-ttl">
+                      <i class="ph ph-arrows-clockwise"></i> Análise recorrente <span class="sp"></span>
+                      <span class="toggle" id="recurToggle" onclick="toggleRecur()"></span>
+                    </div>
+                    <p>Gera a análise automaticamente e apresenta o comparativo com a execução anterior.</p>
+                    <div id="recurOpts" style="display:none">
+                      <div class="sel-wrap" style="max-width:280px">
+                        <select id="recurFreq">
+                          <option value="semanal">Semanal</option>
+                          <option value="quinzenal">Quinzenal</option>
+                          <option value="mensal" selected>Mensal (últimos 30 dias)</option>
+                        </select>
+                        <i class="ph ph-caret-down"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="ia-sub">
+                    <div class="ia-sub-ttl">
+                      <i class="ph ph-brackets-curly"></i> Coleta de informações em variáveis <span class="sp"></span>
+                      <button class="btn btn-sec btn-sm" onclick="openXp()"><i class="ph ph-plus"></i> Novo prompt</button>
+                    </div>
+                    <p>
+                      A IA busca a informação em qualquer ponto da conversa, independentemente do nó que a solicitaria,
+                      e grava na variável de destino. Quando não encontra, a variável permanece vazia — nenhum valor é inferido.
+                    </p>
+                    <div id="xpList" style="display:flex;flex-direction:column;gap:8px"></div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="sec">
+              <div class="sec-hdr">
+                <span class="sec-ok"><i class="ph ph-check"></i></span>
+                <div class="sec-ttl"><h4>Fluxos de jornada<span class="req">*</span></h4><p>Planeje a jornada de comunicação</p></div>
+                <button class="sec-caret" onclick="secToggle(this)"><i class="ph ph-caret-up"></i></button>
+              </div>
+              <div class="sec-body">
+                <div class="canvas">
+                  <div class="canvas-node"><i class="ph ph-chat-circle-dots"></i> Receber mensagem</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── ABA: MONITORAMENTO (placeholder) ── -->
+        <div class="jr-body" id="pane-mon" style="display:none">
+          <div class="jr-col">
+            <div class="empty"><i class="ph ph-chart-line"></i>
+              <h5>Monitoramento da jornada</h5>
+              <p>Tela existente do produto — fora do escopo deste protótipo.</p></div>
+          </div>
+        </div>
+
+        <!-- ── ABA: PRÉVIA DE TESTES (placeholder) ── -->
+        <div class="jr-body" id="pane-prev" style="display:none">
+          <div class="jr-col">
+            <div class="empty"><i class="ph ph-flask"></i>
+              <h5>Prévia de testes</h5>
+              <p>Tela existente do produto — fora do escopo deste protótipo.</p></div>
+          </div>
+        </div>
+
+        <!-- ══ ABA: IA PANORÂMICA — a análise vive dentro da jornada ══ -->
+        <!-- ANGULAR: JourneyPanoramicComponent — src/app/@modules/journey/components/journey-panoramic/ -->
+        <!-- ANGULAR: layout mestre-detalhe — rail de análises + relatório -->
+        <div class="jr-body split" id="pane-ia" style="display:none">
+          <div class="ia-cols">
+            <aside class="ia-rail" id="iaRail"></aside>
+            <div class="ia-report-col" id="iaReportCol"></div>
+          </div>
+        </div>
+
+      </div><!-- /v-journey -->
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: prompt fixo de extração em variável (CCM-3269) ══ -->
+<!-- ANGULAR: MatDialog.open(ExtractionPromptModalComponent) -->
+<div class="modal-bg" id="xpModal">
+  <div class="modal lg">
+    <div class="modal-hdr">
+      <h4>Prompt de extração</h4>
+      <button class="modal-close" onclick="closeXp()"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <p>Descreva a informação que a IA deve buscar na conversa e a variável que receberá o valor encontrado.</p>
+      <div class="ia-form">
+        <div class="field-row">
+          <label class="field-label">Prompt <span class="req"></span></label>
+          <textarea class="ipt" id="xpPrompt" rows="3" style="height:auto;padding:10px 12px;resize:vertical;font-family:inherit"
+            placeholder="Ex.: Capturar o motivo de cancelamento informado pelo contato"></textarea>
+          <div class="field-hint">A IA busca a informação em qualquer ponto da conversa.</div>
+        </div>
+        <div class="field-row">
+          <label class="field-label">Variável de destino <span class="req"></span></label>
+          <div class="sel-wrap">
+            <select id="xpTarget"></select>
+            <i class="ph ph-caret-down"></i>
+          </div>
+          <div class="field-hint">Quando a informação não é encontrada, a variável permanece vazia — nenhum valor é inferido.</div>
+        </div>
+        <div class="modal-alert info">
+          <i class="ph ph-info"></i>
+          <span>Todo valor preenchido pela IA carrega a origem “Preenchido por IA” onde a variável for exibida. Valor já existente não é sobrescrito.</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn btn-quat btn-lg" onclick="closeXp()">Cancelar</button>
+      <button class="btn btn-prim btn-lg" onclick="saveXp()">Salvar prompt</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: detalhamento de um card do relatório ══ -->
+<!-- ANGULAR: MatDialog.open(PanoramicDetailModalComponent) -->
+<div class="modal-bg" id="detModal">
+  <div class="modal det">
+    <div class="det-hdr">
+      <div class="det-top">
+        <div style="flex:1;min-width:0">
+          <span class="det-kind" id="detKind"></span>
+          <h4 id="detTitle"></h4>
+        </div>
+        <button class="modal-close" onclick="closeDet()"><i class="ph ph-x"></i></button>
+      </div>
+    </div>
+    <div class="det-body" id="detBody"></div>
+    <div class="modal-ftr">
+      <span class="det-ftr-note">Dados desta análise · <span id="detScope"></span></span>
+      <button class="btn btn-quat" onclick="closeDet()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOASTS ══ -->
+<div class="toasts" id="toasts"></div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   IA PANORÂMICA (CCM-3269) — PROPOSTA C: NATIVA DA JORNADA
+   O escopo da análise é a própria jornada — não há seletor de
+   jornada em lugar nenhum. O usuário escolhe apenas o período.
+════════════════════════════════════════════════════════════ */
+
+/* ── Variáveis de contato disponíveis como destino ── */
+const VARIABLES = [
+  {id:'v1', code:'{{motivo_cancelamento}}',   label:'Motivo de cancelamento'},
+  {id:'v2', code:'{{melhor_data_pagamento}}', label:'Melhor data de pagamento'},
+  {id:'v3', code:'{{canal_preferido}}',       label:'Canal preferido de contato'},
+  {id:'v4', code:'{{concorrente_citado}}',    label:'Concorrente citado'},
+];
+
+/* ════════════════════════════════════════════════════════════
+   MODO DO PROTÓTIPO
+   ?modo=simplificada → só as análises padrão do sistema
+   ?modo=completa     → padrão + análises criadas pelo usuário
+   Um arquivo só para as duas versões: o que muda é a permissão
+   do usuário criar as próprias análises.
+════════════════════════════════════════════════════════════ */
+const MODO = new URLSearchParams(location.search).get('modo')==='simplificada'
+  ? 'simplificada' : 'completa';
+const FULL = MODO==='completa';
+
+document.title = `Jornada — Vonex.AI · versão ${MODO}`;
+
+/* ── Análises padrão que a IA pode produzir (CCM-3269) ── */
+const BLOCKS = [
+  {key:'summary', name:'Resumo executivo', fixed:true,
+   desc:'Principais achados do período. Sempre incluído.'},
+  {key:'faq',     name:'Perguntas mais frequentes dos contatos',
+   desc:'Agrupadas por tema, com volume, percentual e exemplos reais das conversas.'},
+  {key:'args',    name:'Argumentos utilizados pelos atendentes',
+   desc:'Frequência de uso e eficácia calculada pelo desfecho dos atendimentos.'},
+  {key:'calls',   name:'Validação nas ligações',
+   desc:'Indica se cada pergunta e cada argumento foi confirmado nas ligações, e em quantas.'},
+  {key:'sugg',    name:'Sugestões de melhoria na jornada',
+   desc:'Perguntas frequentes sem resposta automática, com o ponto do fluxo onde inserir.'},
+];
+
+/* ── Jornadas ── */
+const JOURNEYS = [
+  {id:'j1', ini:'QJ', name:'3150', status:'Ativo', date:'30/08/2026 às 16:40',
+   runs:1, version:'00005', trigger:'Receber mensagem', uid:'6a948712d1fbfd44b99d6711',
+   convPerDay:43,
+   ia:{enabled:true, recurring:true, freq:'mensal',
+       blocks:{faq:true, args:true, calls:true, sugg:true},
+       scenarios:[
+         {id:'s1', on:true, name:'Motivo da recusa da proposta',
+          desc:'Identificar por que o contato recusou a proposta de acordo: valor da parcela alto, desconfiança na empresa, dívida já paga, ou indisponibilidade financeira no momento.'},
+       ],
+       xps:[
+         {id:'x1', prompt:'Capturar o motivo de cancelamento informado pelo contato', varId:'v1',
+          stats:{analyzed:1284, filled:287},
+          top:[{v:'Preço acima do orçamento', n:96},
+               {v:'Mudança de operadora', n:74},
+               {v:'Insatisfação com o atendimento', n:52},
+               {v:'Mudança de endereço', n:38},
+               {v:'Outros motivos', n:27}],
+          fills:[{who:'Contato 11 98842-1190', val:'Preço acima do orçamento'},
+                 {who:'Contato 11 99120-7745', val:'Mudança de operadora'},
+                 {who:'Contato 21 98811-3320', val:''},
+                 {who:'Contato 31 99118-4402', val:'Insatisfação com o atendimento'},
+                 {who:'Contato 11 97744-8890', val:'Preço acima do orçamento'},
+                 {who:'Contato 41 98230-1177', val:'Mudança de endereço'},
+                 {who:'Contato 11 99002-5513', val:''},
+                 {who:'Contato 21 98455-6621', val:'Mudança de operadora'}]},
+         {id:'x2', prompt:'Identificar a melhor data de pagamento citada espontaneamente pelo contato', varId:'v2',
+          stats:{analyzed:1284, filled:341},
+          top:[{v:'Dia 05', n:78},
+               {v:'Dia 10', n:71},
+               {v:'Dia 15', n:63},
+               {v:'Após o dia 20', n:62},
+               {v:'Outras datas', n:67}],
+          fills:[{who:'Contato 11 98842-1190', val:'Dia 10, após o salário'},
+                 {who:'Contato 31 99770-2214', val:'Dia 05'},
+                 {who:'Contato 11 99120-7745', val:'Dia 15'},
+                 {who:'Contato 21 98811-3320', val:''},
+                 {who:'Contato 11 97744-8890', val:'Dia 25, quando recebo'},
+                 {who:'Contato 41 98230-1177', val:'Dia 05'}]},
+       ],
+       analyses:[
+         {id:'a1', start:'2026-08-01', end:'2026-08-30', at:'30/08/2026 08:12', user:'Lucas Rehem',  type:'recorrente', status:'concluida', hasPrev:true,  qa:[], scenarioIds:['s1']},
+         {id:'a2', start:'2026-07-01', end:'2026-07-30', at:'30/07/2026 08:10', user:'Lucas Rehem',  type:'recorrente', status:'concluida', hasPrev:false, qa:[], scenarioIds:['s1']},
+       ]}},
+
+  {id:'j2', ini:'QJ', name:'2040', status:'Ativo', date:'30/08/2026 às 13:27',
+   runs:0, version:'00002', trigger:'Enviar mensagem no WhatsApp', uid:'6a9459eb9727e1273fc168b2',
+   convPerDay:28,
+   ia:{enabled:true, recurring:false, freq:'mensal', xps:[],
+       blocks:{faq:true, args:true, calls:false, sugg:true}, scenarios:[],
+       analyses:[
+         {id:'b1', start:'2026-08-10', end:'2026-08-28', at:'28/08/2026 17:44', user:'Camila Alves', type:'manual', status:'falha', hasPrev:false, qa:[]},
+       ]}},
+
+  {id:'j3', ini:'AA', name:'Jornada Duplicada - Teste de vínculo', status:'Ativo', date:'30/08/2026 às 04:37',
+   runs:0, version:'00001', trigger:'Enviar mensagem no WhatsApp', uid:'6a93dd9e9727e1273fc15589',
+   convPerDay:11, ia:{enabled:false, recurring:false, freq:'mensal', xps:[], blocks:{faq:true, args:true, calls:true, sugg:true}, scenarios:[], analyses:[]}},
+
+  {id:'j4', ini:'AA', name:'Validação - Jornada Voz', status:'Ativo', date:'30/08/2026 às 04:28',
+   runs:1, version:'00001', trigger:'Enviar A.I. Voice', uid:'6a93dba79727e1273fc15585',
+   convPerDay:9, ia:{enabled:false, recurring:false, freq:'mensal', xps:[], blocks:{faq:true, args:true, calls:true, sugg:true}, scenarios:[], analyses:[]}},
+
+  {id:'j5', ini:'AA', name:'Vínculo de Jornada - Teste', status:'Ativo', date:'30/08/2026 às 04:24',
+   runs:0, version:'00001', trigger:'Enviar mensagem no WhatsApp', uid:'6a93da959727e1273fc15583',
+   convPerDay:6, ia:{enabled:false, recurring:false, freq:'mensal', xps:[], blocks:{faq:true, args:true, calls:true, sugg:true}, scenarios:[], analyses:[]}},
+];
+
+/* ── Resultado das análises personalizadas (cenários) ── */
+const SCENARIO_RESULTS = {
+  s1:{
+    total:168,
+    intro:'168 dos 412 atendimentos humanos terminaram em recusa. A IA classificou o motivo em quatro grupos:',
+    findings:[
+      {label:'Valor da parcela acima do que o contato pode pagar', n:71, pct:42},
+      {label:'Desconfiança de que o acordo realmente retire a negativação', n:44, pct:26},
+      {label:'Afirma que a dívida já foi paga', n:31, pct:18},
+      {label:'Sem condição financeira no momento — pede novo contato', n:22, pct:13},
+    ],
+    examples:[
+      {txt:'Não tenho como pagar 400 por mês, no máximo 150',src:'Conversa #8890 · 14/08'},
+      {txt:'Já paguei isso em janeiro, tenho o comprovante aqui',src:'Atendimento por voz #204 · 18/08'},
+    ],
+  },
+};
+
+/* Resultado genérico para cenários criados pelo usuário — números estáveis por nome */
+function genericScenario(s){
+  let seed=0; for(const c of (s.name+s.desc)) seed=(seed*31+c.charCodeAt(0))%9973;
+  const total = 60 + seed%180;
+  const a = 30 + seed%18, b = 20 + (seed>>3)%15, c = 14 + (seed>>5)%10;
+  const d = Math.max(100-a-b-c, 5);
+  return {
+    total,
+    intro:`${total} conversas do período trouxeram sinais relacionados a esta análise. A IA agrupou os resultados em:`,
+    findings:[
+      {label:'Grupo predominante identificado pela IA', n:Math.round(total*a/100), pct:a},
+      {label:'Segundo grupo mais recorrente', n:Math.round(total*b/100), pct:b},
+      {label:'Terceiro grupo', n:Math.round(total*c/100), pct:c},
+      {label:'Demais ocorrências', n:Math.round(total*d/100), pct:d},
+    ],
+    examples:[],
+  };
+}
+
+/* Histórico com volume realista: execuções recorrentes dos meses anteriores
+   mais algumas análises avulsas — mostra o problema de escala da listagem. */
+(function seedHistorico(){
+  const j = JOURNEYS.find(x=>x.id==='j1'); if(!j) return;
+  const MES = ['','janeiro','fevereiro','março','abril','maio','junho'];
+  for(let m=6; m>=1; m--){
+    const mm=String(m).padStart(2,'0');
+    const last=new Date(2026,m,0).getDate();
+    j.ia.analyses.push({
+      id:'h'+m, start:`2026-${mm}-01`, end:`2026-${mm}-${last}`,
+      at:`${last}/${mm}/2026 08:${10+m}`, user:'Lucas Rehem',
+      type:'recorrente', status:'concluida', hasPrev:m>1, qa:[], scenarioIds:[],
+    });
+  }
+  /* avulsas, pedidas fora do ciclo */
+  j.ia.analyses.push(
+    {id:'m1', start:'2026-08-15', end:'2026-08-22', at:'22/08/2026 16:40', user:'Camila Alves',
+     type:'manual', status:'concluida', hasPrev:false, qa:[], scenarioIds:[]},
+    {id:'m2', start:'2026-05-10', end:'2026-05-24', at:'24/05/2026 11:07', user:'Suzany Ribeiro',
+     type:'manual', status:'falha', hasPrev:false, qa:[], scenarioIds:[]},
+    {id:'m3', start:'2026-03-01', end:'2026-03-15', at:'15/03/2026 09:22', user:'Camila Alves',
+     type:'manual', status:'concluida', hasPrev:false, qa:[], scenarioIds:[]},
+  );
+  /* mais recentes primeiro */
+  const key = a => a.end;
+  j.ia.analyses.sort((a,b)=> key(b).localeCompare(key(a)));
+})();
+
+/* ── Conteúdo do relatório gerado pela IA ── */
+const REPORT = {
+  summary:'Um terço das dúvidas gira em torno de <strong>descontos e condições de pagamento</strong>, tema que o fluxo responde apenas parcialmente e que concentra o maior volume de transbordo. Os argumentos mais eficazes são os de <strong>ganho imediato e verificável</strong>. <strong>Negativação</strong> e <strong>parcelamento no cartão</strong> somam 21% das perguntas e não têm resposta automática nesta jornada.',
+  coverage:{conversations:1284, humanTotal:412, humanText:318, humanVoice:94, calls:87, callsSkipped:7},
+  themes:[
+    {name:'Descontos e condições de pagamento', variants:[{q:'Pede desconto maior para pagamento à vista', n:171}, {q:'Pergunta o valor mínimo aceito', n:118}, {q:'Quer saber se o desconto vale para todas as parcelas', n:83}, {q:'Pergunta se o desconto muda por forma de pagamento', n:40}], volume:412, pct:32, calls:41, gap:false,
+     examples:[{txt:'Consigo um desconto maior se eu pagar tudo hoje?',src:'Conversa #8842 · 12/08'},
+               {txt:'Qual o valor mínimo que vocês aceitam pra fechar?',src:'Conversa #9017 · 19/08'},
+               {txt:'Esse desconto vale pra todas as parcelas atrasadas?',src:'Atendimento por voz #221 · 22/08'}]},
+    {name:'Prazos e data de vencimento', variants:[{q:'Quer alterar a data de vencimento', n:112}, {q:'Pergunta até quando a proposta é válida', n:89}, {q:'Pede prazo extra para o próximo mês', n:67}], volume:268, pct:21, calls:29, gap:false,
+     examples:[{txt:'Posso mudar o vencimento para o dia 10?',src:'Conversa #8760 · 08/08'},
+               {txt:'Se eu pagar amanhã ainda vale a proposta?',src:'Conversa #9134 · 24/08'}]},
+    {name:'Segunda via e comprovante', variants:[{q:'Pede o boleto novamente', n:96}, {q:'Pergunta como enviar o comprovante', n:71}, {q:'Diz que não recebeu o link de pagamento', n:38}], volume:205, pct:16, calls:18, gap:false,
+     examples:[{txt:'Manda o boleto de novo, não achei aqui',src:'Conversa #8901 · 15/08'},
+               {txt:'Já paguei, como envio o comprovante?',src:'Conversa #9203 · 26/08'}]},
+    {name:'Negativação e Serasa', variants:[{q:'Pergunta o prazo para sair do Serasa após pagar', n:78}, {q:'Quer saber se já está negativado', n:44}, {q:'Pergunta se o acordo já retira a restrição', n:32}], volume:154, pct:12, calls:33, gap:true,
+     examples:[{txt:'Em quanto tempo meu nome sai do Serasa depois que eu pagar?',src:'Conversa #8815 · 11/08'},
+               {txt:'Meu nome já está negativado? Não recebi aviso',src:'Atendimento por voz #198 · 14/08'},
+               {txt:'Se eu fizer o acordo hoje já tira a restrição?',src:'Conversa #9088 · 21/08'}]},
+    {name:'Parcelamento no cartão', variants:[{q:'Pergunta se aceita cartão de crédito', n:64}, {q:'Quer saber em quantas vezes sem juros', n:39}, {q:'Pergunta se pode usar cartão de terceiro', n:13}], volume:116, pct:9, calls:12, gap:true,
+     examples:[{txt:'Dá pra parcelar no cartão de crédito?',src:'Conversa #8977 · 17/08'},
+               {txt:'Aceita cartão em quantas vezes sem juros?',src:'Conversa #9155 · 25/08'}]},
+    {name:'Cancelamento do serviço', variants:[{q:'Pede o cancelamento do serviço', n:51}, {q:'Pergunta a multa por cancelar', n:26}], volume:77, pct:6, calls:9, gap:false,
+     examples:[{txt:'Não quero mais o serviço, como cancelo?',src:'Conversa #8833 · 12/08'}]},
+    {name:'Outros', variants:[{q:'Assuntos sem agrupamento relevante', n:52}], volume:52, pct:4, calls:4, gap:false,
+     examples:[{txt:'Vocês têm loja física aqui em Campinas?',src:'Conversa #9061 · 20/08'}]},
+  ],
+  args:[
+    {name:'Desconto por pagamento à vista até o fim do dia', inThemes:['Descontos e condições de pagamento', 'Prazos e data de vencimento'], snippets:[{txt:'Se o senhor fechar hoje eu consigo deixar por 1.240 à vista, amanhã volta pro valor cheio.', src:'Atendimento #3312 · 13/08'}, {txt:'Esse valor é só até o fim do expediente, depois o sistema recalcula.', src:'Atendimento por voz #207 · 19/08'}], uses:187, eff:68, calls:24,
+     outcomes:{deal:127,callback:38,refusal:22}, note:'Maior eficácia quando o valor final é dito antes da condição de prazo.'},
+    {name:'Retirada da negativação em até 5 dias úteis', inThemes:['Negativação e Serasa'], snippets:[{txt:'Assim que compensar o pagamento, em até 5 dias úteis seu nome sai do Serasa.', src:'Atendimento #3401 · 15/08'}, {txt:'Eu te envio o comprovante da baixa por aqui mesmo, pra sua segurança.', src:'Atendimento por voz #219 · 21/08'}], uses:96, eff:61, calls:31,
+     outcomes:{deal:59,callback:24,refusal:13}, note:'Confirmado nas ligações como o argumento que mais destrava objeção de desconfiança.'},
+    {name:'Parcelamento com entrada reduzida', inThemes:['Descontos e condições de pagamento', 'Parcelamento no cartão'], snippets:[{txt:'Dá pra entrar com 80 reais e o resto em 6 vezes.', src:'Atendimento #3288 · 12/08'}, {txt:'A entrada pode ser menor, mas aí a parcela sobe um pouco.', src:'Atendimento #3455 · 22/08'}], uses:143, eff:54, calls:19,
+     outcomes:{deal:77,callback:41,refusal:25}, note:'Eficácia cai para 31% quando apresentado antes do desconto à vista.'},
+    {name:'Prazo estendido para a próxima fatura', inThemes:['Prazos e data de vencimento'], snippets:[{txt:'Consigo deixar pro dia 10 do mês que vem, sem juros adicionais.', src:'Atendimento #3350 · 17/08'}, {txt:'Se preferir, a gente retoma esse contato na semana que vem.', src:'Atendimento #3502 · 25/08'}], uses:74, eff:38, calls:8,
+     outcomes:{deal:28,callback:30,refusal:16}, note:'Alto índice de retorno agendado sem desfecho — gera reatendimento.'},
+    {name:'Encaminhamento para supervisor com alçada maior', inThemes:['Descontos e condições de pagamento'], snippets:[{txt:'Vou passar para o meu supervisor, ele tem uma alçada maior de desconto.', src:'Atendimento #3377 · 18/08'}], uses:41, eff:27, calls:5,
+     outcomes:{deal:11,callback:17,refusal:13}, note:'Usado como último recurso; concentra os atendimentos mais longos.'},
+  ],
+  suggestions:[
+    {title:'Responder o prazo de retirada da negativação no próprio fluxo',
+     desc:'154 contatos (12%) perguntaram sobre Serasa sem resposta automática — todos foram transbordados.',
+     node:'Menu de dúvidas → nova opção “Negativação”'},
+    {title:'Incluir parcelamento no cartão na apresentação da proposta',
+     desc:'116 contatos (9%) perguntaram por cartão depois de já terem recebido a proposta.',
+     node:'Apresentação da proposta → antes da confirmação'},
+    {title:'Oferecer 2ª via do boleto antes do transbordo',
+     desc:'205 perguntas de segunda via poderiam ser resolvidas com um botão de reenvio no fluxo.',
+     node:'Confirmação de interesse → botão “Reenviar boleto”'},
+    {title:'Antecipar o desconto à vista na abertura',
+     desc:'O argumento de maior eficácia (68%) só aparece após a primeira objeção em 6 de cada 10 atendimentos.',
+     node:'Apresentação da proposta → primeira mensagem'},
+  ],
+  comparison:[
+    {label:'Perguntas sobre negativação', cur:'12%', prev:'15%', dir:'up',   note:'−3 p.p.'},
+    {label:'Eficácia média dos argumentos', cur:'52%', prev:'46%', dir:'up',   note:'+6 p.p.'},
+    {label:'Transbordo para humano', cur:'32%', prev:'29%', dir:'down', note:'+3 p.p.'},
+  ],
+};
+
+/* ════════════════════════════════════════════════════════════
+   ESTADO
+════════════════════════════════════════════════════════════ */
+let cur      = null;   /* jornada aberta */
+let curAn    = null;   /* análise aberta */
+let per      = {preset:30, start:'', end:''};
+let busy     = false;
+
+/* ── utilitários ── */
+function fmt(i){ if(!i) return '—'; const [y,m,d]=i.split('-'); return `${d}/${m}/${y}`; }
+function nDays(a,b){ if(!a||!b) return 0; return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000)+1; }
+function isoOf(d){ return d.toISOString().slice(0,10); }
+function hhmm(){ const n=new Date(); return `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`; }
+function today(){ const n=new Date(); return `${String(n.getDate()).padStart(2,'0')}/${String(n.getMonth()+1).padStart(2,'0')}/${n.getFullYear()}`; }
+
+function toast(type,msg){
+  const map={ok:{cls:'toast-ok',icon:'ph-check-circle'},err:{cls:'toast-err',icon:'ph-x-circle'},
+              warn:{cls:'toast-warn',icon:'ph-warning-circle'},info:{cls:'toast-info',icon:'ph-info'}};
+  const t=map[type]||map.info;
+  const el=document.createElement('div');
+  el.className=`toast ${t.cls}`;
+  el.innerHTML=`<i class="ph ${t.icon} toast-icon"></i><span class="toast-msg">${msg}</span>
+    <button class="toast-close" onclick="this.closest('.toast').remove()"><i class="ph ph-x"></i></button>`;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(()=>el&&el.remove(),4500);
+}
+
+/* ════════════════════════════════════════════════════════════
+   LISTAGEM
+════════════════════════════════════════════════════════════ */
+function showList(){
+  document.getElementById('v-list').style.display='flex';
+  document.getElementById('v-journey').style.display='none';
+  renderList();
+}
+
+function renderList(){
+  const q=(document.getElementById('lstSearch').value||'').toLowerCase();
+  const list=JOURNEYS.filter(j=>!q||j.name.toLowerCase().includes(q));
+  document.getElementById('lstBody').innerHTML = list.map(j=>{
+    const fresh = j.ia.enabled && j.ia.analyses.some(a=>a.fresh);
+    return `
+    <div class="jcard-l">
+      <div class="jcard-top">
+        <span class="avatar-i">${j.ini}</span>
+        <div class="jcard-name" onclick="openJourney('${j.id}')">${j.name}</div>
+        <span class="badge b-pub">${j.status}</span>
+        <div class="jcard-acts">
+          ${j.ia.enabled?`
+            <!-- atalho para a aba de análise da própria jornada -->
+            <button class="jact ia" title="IA Panorâmica" onclick="openJourney('${j.id}','ia')">
+              <i class="ph ph-sparkle"></i>${fresh?'<span class="dot"></span>':''}
+            </button>`:''}
+          <button class="jact" title="Visualizar"><i class="ph ph-eye"></i></button>
+          <button class="jact" title="Monitoramento"><i class="ph ph-chart-line-up"></i></button>
+          <button class="jact" title="Documentação"><i class="ph ph-notebook"></i></button>
+          <button class="jact" title="Prévia de testes"><i class="ph ph-flask"></i></button>
+          <span class="jact-sep"></span>
+          <button class="jact" title="Pausar"><i class="ph ph-pause-circle"></i></button>
+          <button class="jact" title="Duplicar"><i class="ph ph-copy"></i></button>
+          <button class="jact" title="Cancelar"><i class="ph ph-x-circle"></i></button>
+        </div>
+      </div>
+      <div class="jcard-meta">
+        <span class="jmeta"><i class="ph ph-clock"></i> ${j.date}</span>
+        <span class="jmeta"><i class="ph ph-arrow-elbow-right-up"></i> ${j.runs} acionamentos</span>
+        <span class="jmeta"><i class="ph ph-git-branch"></i> Versão em uso: ${j.version}</span>
+        <span class="jmeta"><i class="ph ph-phone-call"></i> ${j.trigger}</span>
+        <span class="jmeta id"><i class="ph ph-globe"></i> ${j.uid}</span>
+        ${j.ia.enabled?'<span class="badge-ia"><i class="ph ph-sparkle"></i> IA Panorâmica</span>':''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ════════════════════════════════════════════════════════════
+   JORNADA
+════════════════════════════════════════════════════════════ */
+function openJourney(id, tab){
+  cur = id==='new'
+    ? {id:'new', ini:'NJ', name:'', status:'Rascunho', date:today(), runs:0, version:'00001',
+       trigger:'Receber mensagem', uid:'—', convPerDay:20,
+       ia:{enabled:false, recurring:false, freq:'mensal', xps:[], blocks:{faq:true, args:true, calls:true, sugg:true}, scenarios:[], analyses:[]}}
+    : JOURNEYS.find(x=>x.id===id);
+  curAn = null; busy = false;
+  setPeriod(30, true);
+
+  document.getElementById('v-list').style.display='none';
+  document.getElementById('v-journey').style.display='flex';
+
+  document.getElementById('jrName').value = cur.name;
+  document.getElementById('jrDesc').value = cur.name;
+  renderJourneyHeader();
+
+  /* estado do cartão da IA */
+  document.getElementById('iaToggle').classList.toggle('on', cur.ia.enabled);
+  document.getElementById('iaSwitch').classList.toggle('on', cur.ia.enabled);
+  document.getElementById('iaConf').classList.toggle('on', cur.ia.enabled);
+  document.getElementById('secIa').classList.toggle('off', !cur.ia.enabled);
+  document.getElementById('recurToggle').classList.toggle('on', cur.ia.recurring);
+  document.getElementById('recurOpts').style.display = cur.ia.recurring?'':'none';
+  document.getElementById('recurFreq').value = cur.ia.freq;
+  renderBlocks();
+  applyModo();
+  if(FULL) renderScenarios();
+  renderXps();
+  syncIaTab();
+
+  jrTab(tab || 'dados');
+}
+
+function renderJourneyHeader(){
+  const n=document.getElementById('jrName').value;
+  document.getElementById('jrStatus').textContent = cur.status;
+  document.getElementById('jrVersion').textContent = `Versão - ${cur.version.replace(/^0+/,'').padStart(3,'0')}`;
+  document.getElementById('jrInUse').style.display = cur.id==='new' ? 'none' : '';
+  if(cur.id!=='new') cur.name = n;
+}
+
+function jrTab(name){
+  ['dados','mon','prev','ia'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active', t===name);
+    document.getElementById('pane-'+t).style.display = t===name ? '' : 'none';
+  });
+  if(name==='ia'){
+    cur.ia.analyses.forEach(a=>a.fresh=false);
+    renderIaPane();
+  }
+}
+
+function secToggle(btn){ btn.closest('.sec').classList.toggle('closed'); }
+function pickOpt(btn){
+  btn.closest('.opts').querySelectorAll('.opt').forEach(o=>o.classList.remove('on'));
+  btn.classList.add('on');
+}
+function saveJourney(){ toast('ok','Jornada salva.'); }
+
+/* ── a aba só existe quando a IA está habilitada na jornada ── */
+function syncIaTab(){
+  document.getElementById('tab-ia').style.display = cur.ia.enabled ? '' : 'none';
+}
+
+function toggleIa(){
+  cur.ia.enabled = !cur.ia.enabled;
+  document.getElementById('iaToggle').classList.toggle('on', cur.ia.enabled);
+  document.getElementById('iaSwitch').classList.toggle('on', cur.ia.enabled);
+  document.getElementById('iaConf').classList.toggle('on', cur.ia.enabled);
+  document.getElementById('secIa').classList.toggle('off', !cur.ia.enabled);
+  syncIaTab();
+  if(cur.ia.enabled){
+    toast('ok','IA Panorâmica habilitada. A aba foi adicionada à jornada.');
+  } else {
+    if(document.getElementById('tab-ia').classList.contains('active')) jrTab('dados');
+    toast('warn','IA Panorâmica desabilitada. A aba e as análises ficam indisponíveis.');
+  }
+}
+
+function toggleRecur(){
+  cur.ia.recurring = !cur.ia.recurring;
+  document.getElementById('recurToggle').classList.toggle('on', cur.ia.recurring);
+  document.getElementById('recurOpts').style.display = cur.ia.recurring?'':'none';
+}
+
+/* Esconde o que é exclusivo da versão completa */
+function applyModo(){
+  const s=document.getElementById('subScenarios');
+  if(s) s.style.display = FULL ? '' : 'none';
+}
+
+/* Faixa de validação: diz qual versão está aberta e permite trocar.
+   Não faz parte do produto — é andaime do protótipo. */
+function initModoPill(){
+  const el=document.createElement('div');
+  el.className='modo-pill';
+  el.innerHTML=`
+    <span class="dot ${FULL?'full':''}"></span>
+    Versão ${FULL?'completa':'simplificada'}
+    <a href="index.html">trocar</a>`;
+  document.body.appendChild(el);
+}
+
+/* ── Seleção das análises padrão ── */
+function renderBlocks(){
+  document.getElementById('blockList').innerHTML = BLOCKS.map(b=>{
+    const on = b.fixed || cur.ia.blocks[b.key];
+    return `<div class="an-opt ${on?'on':''} ${b.fixed?'fixed':''}"
+      ${b.fixed?'':`onclick="toggleBlock('${b.key}')"`}>
+      <span class="an-check"><i class="ph ph-check"></i></span>
+      <div class="an-opt-body">
+        <div class="an-opt-ttl">${b.name}</div>
+        <div class="an-opt-sub">${b.desc}</div>
+      </div>
+      ${b.fixed?'<span class="an-lock"><i class="ph ph-lock-simple"></i> Fixo</span>':''}
+    </div>`;
+  }).join('');
+}
+
+function toggleBlock(key){
+  cur.ia.blocks[key] = !cur.ia.blocks[key];
+  renderBlocks();
+}
+
+/* ── Análises personalizadas (cenários) ── */
+function renderScenarios(){
+  const el=document.getElementById('scnList');
+  if(!cur.ia.scenarios.length){
+    el.innerHTML=`<div style="font-size:12.5px;color:var(--neutral-color-low-light);font-style:italic">
+      Nenhuma análise personalizada. As análises padrão acima já são geradas.</div>`;
+    return;
+  }
+  el.innerHTML = cur.ia.scenarios.map(s=>`
+    <div class="scn ${s.on?'on':''} ${s.open?'open':''}" id="scn-${s.id}">
+      <div class="scn-hdr" onclick="toggleScnOpen('${s.id}')">
+        <span class="scn-ok"><i class="ph ph-check"></i></span>
+        <div class="scn-name">
+          <span class="pre">Análise:</span>
+          ${s.name ? s.name : '<span class="scn-noname">sem nome</span>'}
+        </div>
+        <span class="toggle ${s.on?'on':''}" onclick="event.stopPropagation();toggleScn('${s.id}')"></span>
+        <button class="jact" title="Excluir" onclick="event.stopPropagation();delScenario('${s.id}')">
+          <i class="ph ph-trash"></i>
+        </button>
+        <i class="ph ph-caret-down scn-caret"></i>
+      </div>
+      <div class="scn-body">
+        <div class="scn-field">
+          <div class="scn-lbl">Nome da análise<span class="req">*</span>
+            <span class="learn"><i class="ph ph-info"></i> Saiba mais</span></div>
+          <div class="scn-help">Determine um nome para o que a I.A. deverá identificar nas conversas.</div>
+          <input type="text" value="${(s.name||'').replace(/"/g,'&quot;')}"
+            placeholder="Ex.: Motivo da recusa da proposta"
+            oninput="editScn('${s.id}','name',this.value)">
+        </div>
+        <div class="scn-field">
+          <div class="scn-lbl">Descrição<span class="req">*</span>
+            <span class="learn"><i class="ph ph-info"></i> Saiba mais</span></div>
+          <div class="scn-help">Explique de forma objetiva para a I.A. o que ela deve procurar nesta análise.</div>
+          <textarea placeholder="Ex.: Identificar por que o contato recusou a proposta de acordo"
+            oninput="editScn('${s.id}','desc',this.value)">${s.desc||''}</textarea>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleScnOpen(id){
+  const s=cur.ia.scenarios.find(x=>x.id===id); if(!s) return;
+  s.open=!s.open; renderScenarios();
+}
+function toggleScn(id){
+  const s=cur.ia.scenarios.find(x=>x.id===id); if(!s) return;
+  s.on=!s.on; renderScenarios();
+}
+function editScn(id, field, val){
+  const s=cur.ia.scenarios.find(x=>x.id===id); if(!s) return;
+  s[field]=val;
+  /* atualiza só o título do cabeçalho, para não perder o foco do campo */
+  if(field==='name'){
+    const el=document.querySelector(`#scn-${id} .scn-name`);
+    if(el) el.innerHTML=`<span class="pre">Análise:</span> ${val||'<span class="scn-noname">sem nome</span>'}`;
+  }
+}
+function addScenario(){
+  cur.ia.scenarios.push({id:'s'+Date.now(), on:true, open:true, name:'', desc:''});
+  renderScenarios();
+  const inp=document.querySelector('.scn:last-child .scn-field input');
+  if(inp) inp.focus();
+}
+function delScenario(id){
+  cur.ia.scenarios=cur.ia.scenarios.filter(x=>x.id!==id);
+  renderScenarios();
+  toast('ok','Análise personalizada removida.');
+}
+
+function renderXps(){
+  const el=document.getElementById('xpList');
+  if(!cur.ia.xps.length){
+    el.innerHTML=`<div style="font-size:12.5px;color:var(--neutral-color-low-light);font-style:italic">
+      Nenhum prompt de extração configurado.</div>`;
+    return;
+  }
+  el.innerHTML = cur.ia.xps.map(x=>{
+    const v=VARIABLES.find(y=>y.id===x.varId);
+    return `<div class="xp">
+      <div class="xp-ico"><i class="ph ph-brackets-curly"></i></div>
+      <div class="xp-body">
+        <div class="xp-prompt">“${x.prompt}”</div>
+        <div class="xp-target">
+          <span class="code">${v?v.code:'—'}</span>
+          <span class="ai-src"><i class="ph ph-sparkle"></i> Preenchido por IA</span>
+        </div>
+      </div>
+      <button class="jact" title="Excluir" onclick="delXp('${x.id}')"><i class="ph ph-trash"></i></button>
+    </div>`;
+  }).join('');
+}
+
+/* ── Prompt de extração: mesmo fluxo em modal da proposta A ── */
+function openXp(){
+  document.getElementById('xpTarget').innerHTML =
+    VARIABLES.map(v=>`<option value="${v.id}">${v.label} · ${v.code}</option>`).join('');
+  document.getElementById('xpPrompt').value='';
+  document.getElementById('xpModal').classList.add('open');
+}
+function closeXp(){ document.getElementById('xpModal').classList.remove('open'); }
+
+function saveXp(){
+  const prompt=document.getElementById('xpPrompt').value.trim();
+  if(!prompt){ toast('err','Informe o prompt de extração.'); return; }
+  cur.ia.xps.push({
+    id:'x'+Date.now(), prompt,
+    varId:document.getElementById('xpTarget').value,
+    stats:{analyzed:0, filled:0}, top:[], fills:[],
+  });
+  closeXp(); renderXps();
+  toast('ok','Prompt de extração salvo. A variável será preenchida na próxima geração de análise.');
+}
+
+function delXp(id){ cur.ia.xps=cur.ia.xps.filter(x=>x.id!==id); renderXps(); }
+
+/* ════════════════════════════════════════════════════════════
+   ABA IA PANORÂMICA — escopo = a própria jornada
+════════════════════════════════════════════════════════════ */
+function setPeriod(n, silent){
+  const end=new Date(), start=new Date(); start.setDate(start.getDate()-(n-1));
+  per={preset:n, start:isoOf(start), end:isoOf(end)};
+  customOpen=false;
+  if(!silent) renderIaPane();
+}
+function customPeriod(){
+  per.preset=null;
+  per.start=document.getElementById('perStart').value;
+  per.end=document.getElementById('perEnd').value;
+  renderIaPane();
+}
+
+function rangeState(){
+  const d=nDays(per.start, per.end);
+  if(!per.start||!per.end) return {ok:false, cls:'', msg:'Selecione o período da análise.'};
+  if(d<=0) return {ok:false, cls:'err', msg:'A data final deve ser posterior à data inicial.'};
+  if(d>30) return {ok:false, cls:'err', msg:`Período de <strong>${d} dias</strong> — o limite por análise é de 30 dias.`};
+  const vol=Math.round(cur.convPerDay*d);
+  if(vol<120) return {ok:true, cls:'warn', d, msg:`Cerca de <strong>${vol} conversas</strong> no período. A análise pode não ser representativa.`};
+  return {ok:true, cls:'', d, msg:`Período de <strong>${d} dias</strong> · cerca de ${vol.toLocaleString('pt-BR')} conversas.`};
+}
+
+function renderIaPane(){
+  renderRail();
+  renderReportCol();
+}
+
+/* ── rail esquerdo: todas as análises da jornada ── */
+let railFilter = {status:'', type:'', q:''};
+let customOpen = false;
+function toggleCustom(){ customOpen = !customOpen; renderRail(); }
+function setRailFilter(k,v){ railFilter[k]=v; renderRail(); }
+
+function renderRail(){
+  const MES=['janeiro','fevereiro','março','abril','maio','junho',
+             'julho','agosto','setembro','outubro','novembro','dezembro'];
+  const all=cur.ia.analyses;
+  const q=railFilter.q.toLowerCase();
+  const list=all.filter(a=>
+    (!railFilter.status || a.status===railFilter.status) &&
+    (!railFilter.type   || a.type===railFilter.type) &&
+    (!q || a.user.toLowerCase().includes(q) || fmt(a.start).includes(q) || fmt(a.end).includes(q))
+  );
+
+  const groups={};
+  list.forEach(a=>{
+    const [y,m]=a.end.split('-');
+    (groups[`${MES[+m-1]} de ${y}`] = groups[`${MES[+m-1]} de ${y}`]||[]).push(a);
+  });
+
+  const dot={concluida:'ok', falha:'err', processando:'proc'};
+
+  const st=rangeState();
+  const showDates = customOpen || per.preset===null;
+
+  document.getElementById('iaRail').innerHTML = `
+    <!-- ANGULAR: bloco de geração — escopo fixo na jornada + período -->
+    <div class="ia-rail-new">
+      <span class="ia-rail-lbl">Nova análise</span>
+      <div class="per">
+        <button class="per-btn ${per.preset===7?'on':''}"  onclick="setPeriod(7)">7d</button>
+        <button class="per-btn ${per.preset===14?'on':''}" onclick="setPeriod(14)">14d</button>
+        <button class="per-btn ${per.preset===30?'on':''}" onclick="setPeriod(30)">30d</button>
+        <button class="per-btn ${showDates?'on':''}" onclick="toggleCustom()">Outro</button>
+      </div>
+      ${showDates?`
+        <div class="ia-rail-dates">
+          <div><label>De</label><input type="date" id="perStart" value="${per.start}" onchange="customPeriod()"></div>
+          <div><label>Até</label><input type="date" id="perEnd" value="${per.end}" onchange="customPeriod()"></div>
+        </div>`:''}
+      <div class="range-msg ${st.cls}">${st.msg}</div>
+      <button class="btn btn-prim" onclick="generate()" ${st.ok&&!busy?'':'disabled style="opacity:.5;cursor:default"'}>
+        <i class="ph ph-sparkle"></i> Gerar análise
+      </button>
+    </div>
+
+    <div class="ia-rail-hdr">
+      <h4>Análises <span class="n">${all.length}</span></h4>
+      <p>Reabra uma análise concluída a qualquer momento, sem novo processamento.</p>
+    </div>
+    <div class="ia-rail-filters">
+      <div class="inp-search">
+        <i class="ph ph-magnifying-glass"></i>
+        <input type="text" placeholder="Buscar por data ou solicitante"
+          value="${railFilter.q}" oninput="setRailFilter('q', this.value)">
+      </div>
+      <div class="two">
+        <div class="sel-filter">
+          <select onchange="setRailFilter('status', this.value)">
+            <option value="">Status</option>
+            <option value="concluida" ${railFilter.status==='concluida'?'selected':''}>Concluída</option>
+            <option value="processando" ${railFilter.status==='processando'?'selected':''}>Processando</option>
+            <option value="falha" ${railFilter.status==='falha'?'selected':''}>Falha</option>
+          </select>
+          <i class="ph ph-caret-down"></i>
+        </div>
+        <div class="sel-filter">
+          <select onchange="setRailFilter('type', this.value)">
+            <option value="">Tipo</option>
+            <option value="manual" ${railFilter.type==='manual'?'selected':''}>Manual</option>
+            <option value="recorrente" ${railFilter.type==='recorrente'?'selected':''}>Recorrente</option>
+          </select>
+          <i class="ph ph-caret-down"></i>
+        </div>
+      </div>
+    </div>
+    <div class="ia-rail-list">
+      ${Object.keys(groups).length ? Object.entries(groups).map(([k,items])=>`
+        <div class="ia-rail-group">
+          <div class="hist-group">${k} <span>${items.length}</span></div>
+          ${items.map(a=>`
+            <div class="ra ${a.id===curAn?'current':''}" id="ra-${a.id}"
+              onclick="${a.status==='falha'?`retry('${a.id}')`:`openAnalysis('${a.id}')`}">
+              <div class="ra-top">
+                <span class="ra-dot ${dot[a.status]}"></span>
+                <span class="ra-per">${fmt(a.start)} – ${fmt(a.end)}</span>
+                <span style="font-size:10.5px;color:var(--neutral-color-low-light)">${nDays(a.start,a.end)}d</span>
+              </div>
+              <div class="ra-meta">
+                <span><i class="ph ${a.type==='recorrente'?'ph-arrows-clockwise':'ph-hand-pointing'}"></i> ${a.type==='recorrente'?'Recorrente':'Manual'}</span>
+                <span class="sep"></span><span>${a.at.split(' ')[0]}</span>
+              </div>
+              <div class="ra-meta">${a.user}</div>
+              ${a.status==='falha'?'<span class="ra-retry"><i class="ph ph-arrow-clockwise"></i> Tentar novamente</span>':''}
+            </div>`).join('')}
+        </div>`).join('')
+      : `<div class="empty" style="padding:32px 6px">
+           <i class="ph ph-magnifying-glass"></i>
+           <h5>Nada encontrado</h5>
+           <p>Ajuste os filtros para ver outras análises.</p>
+         </div>`}
+    </div>`;
+
+  /* mantém a análise aberta visível no rail */
+  const sel=document.getElementById('ra-'+curAn);
+  if(sel) sel.scrollIntoView({block:'nearest'});
+}
+
+/* ── coluna direita: o relatório da análise selecionada ── */
+function renderReportCol(){
+  const el=document.getElementById('iaReportCol');
+  const a=cur.ia.analyses.find(x=>x.id===curAn);
+
+  if(busy){ el.innerHTML = `<div style="padding-top:20px">${sourcesBlock()}</div>`; return; }
+
+  if(!a){
+    el.innerHTML = `<div class="sec" style="margin-top:20px"><div class="empty">
+      <i class="ph ph-sparkle"></i>
+      <h5>${cur.ia.analyses.length?'Nenhuma análise aberta':'Nenhuma análise gerada'}</h5>
+      <p>${cur.ia.analyses.length
+            ? 'Escolha uma análise na lista ao lado para ver o relatório.'
+            : 'Escolha um período de até 30 dias e gere a primeira análise desta jornada.'}</p>
+    </div></div>`;
+    return;
+  }
+
+  const badge={concluida:'<span class="badge b-pub">Concluída</span>',
+               processando:'<span class="badge b-proc">Processando</span>',
+               falha:'<span class="badge b-err">Falha</span>'}[a.status];
+
+  /* cabeçalho fixo: qual análise está sendo lida, mesmo rolando */
+  el.innerHTML = `
+    <div class="rep-sticky">
+      <div class="rep-sticky-t">
+        <div class="rep-sticky-p">${fmt(a.start)} – ${fmt(a.end)}
+          <span style="font-weight:400;color:var(--neutral-color-low-light)">(${nDays(a.start,a.end)} dias)</span></div>
+        <div class="rep-sticky-m">
+          <span><i class="ph ${a.type==='recorrente'?'ph-arrows-clockwise':'ph-hand-pointing'}"></i> ${a.type==='recorrente'?'Recorrente':'Manual'}</span>
+          <span class="sep"></span><span>Gerada em ${a.at}</span>
+          <span class="sep"></span><span>${a.user}</span>
+        </div>
+      </div>
+      ${badge}
+    </div>
+    ${reportBlock()}`;
+  el.scrollTop = 0;
+}
+
+/* ── geração em segundo plano, mostrando as fontes lidas ── */
+let srcState = [];
+const SOURCES = [
+  'Estrutura da jornada',
+  'Relatório da jornada',
+  'Relatório do agente conversacional',
+  'Conversas do período',
+  'Atendimentos humanos por mensagem e por voz',
+  'Ligações com transcrição automática',
+];
+
+function sourcesBlock(){
+  return `
+  <div class="sec">
+    <div class="sec-hdr" style="padding:18px 20px">
+      <span class="sec-ok" style="border-color:var(--brand-color-secundary-pure);color:var(--brand-color-secundary-pure)">
+        <i class="ph ph-circle-notch spin"></i></span>
+      <div class="sec-ttl"><h4 style="font-size:16px">Gerando a análise</h4>
+        <p>Você pode continuar navegando — avisamos ao término.</p></div>
+    </div>
+    <div class="sec-body">
+      <div class="src-list">
+        ${SOURCES.map((s,i)=> srcState[i]==='done'
+          ? `<div class="src done"><i class="ph ph-check-circle"></i> ${s}</div>`
+          : `<div class="src"><i class="ph ph-circle-notch spin"></i> ${s}</div>`).join('')}
+        ${srcState.every(x=>x==='done')
+          ? `<div class="src skip"><i class="ph ph-microphone-slash"></i> ${REPORT.coverage.callsSkipped} ligações sem transcrição — desconsideradas</div>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function generate(){
+  const st=rangeState();
+  if(!st.ok || busy) return;
+  busy=true; srcState=SOURCES.map(()=>'pending');
+  renderIaPane();
+
+  SOURCES.forEach((s,i)=>{
+    setTimeout(()=>{ srcState[i]='done'; if(busy) renderIaPane(); }, 500+i*550);
+  });
+
+  setTimeout(()=>{
+    const id='a'+Date.now();
+    cur.ia.analyses.unshift({
+      id, start:per.start, end:per.end, at:`${today()} ${hhmm()}`,
+      user:'Suzany Ribeiro', type: cur.ia.recurring?'recorrente':'manual',
+      status:'concluida', hasPrev: cur.ia.analyses.length>0, qa:[], fresh:true,
+      scenarioIds: cur.ia.scenarios.filter(s=>s.on && s.name).map(s=>s.id),
+    });
+    busy=false; curAn=id;
+    renderIaPane();
+    toast('ok',`Análise de “${cur.name}” concluída.`);
+  }, 500 + SOURCES.length*550 + 900);
+}
+
+function retry(id){
+  const a=cur.ia.analyses.find(x=>x.id===id); if(!a) return;
+  a.status='processando'; renderIaPane();
+  toast('info','Nova tentativa em processamento.');
+  setTimeout(()=>{ a.status='concluida'; renderIaPane(); toast('ok','Análise concluída.'); },3500);
+}
+
+function openAnalysis(id){ curAn=id; renderIaPane(); }
+
+/* ── relatório ── */
+/* Selo de validação em ligações — só aparece se o bloco estiver habilitado */
+/* Blocos das análises personalizadas configuradas na jornada */
+function scenarioBlocks(a){
+  if(!FULL) return '';
+  const list = cur.ia.scenarios.filter(s=>s.on && s.name);
+  if(!list.length) return '';
+
+  return list.map(s=>{
+    const included = !a.scenarioIds || a.scenarioIds.includes(s.id);
+    if(!included){
+      return `
+      <div class="sec"><div class="sec-hdr" style="padding:18px 20px">
+        <div class="sec-ttl"><h4 style="font-size:16px">${s.name}</h4>
+          <p>Análise personalizada desta jornada</p></div></div>
+        <div class="sec-body">
+          <div class="scn-pending"><i class="ph ph-clock"></i>
+            Esta análise foi criada depois desta geração. Uma análise concluída não é alterada —
+            gere uma nova para incluí-la.</div>
+        </div>
+      </div>`;
+    }
+
+    const r = SCENARIO_RESULTS[s.id] || genericScenario(s);
+    return `
+    <div class="sec"><div class="sec-hdr" style="padding:18px 20px">
+      <div class="sec-ttl"><h4 style="font-size:16px">${s.name}</h4>
+        <p>Análise personalizada desta jornada</p></div>
+      <span class="ai-src"><i class="ph ph-sparkle"></i> Definida por prompt</span></div>
+      <div class="sec-body" style="gap:10px">
+        <div class="scn-res">
+          <div class="scn-res-ico"><i class="ph ph-magic-wand"></i></div>
+          <div class="scn-res-b">
+            <div class="scn-res-t">${r.intro}</div>
+          </div>
+        </div>
+        ${r.findings.map((f,fi)=>`
+          <div class="row"><div class="row-hdr" style="cursor:default">
+            <div class="row-main">
+              <div class="row-ttl">${f.label}</div>
+              <div class="row-meta"><span>${f.n} ocorrências</span></div>
+              <div class="bar"><span style="width:${f.pct}%"></span></div>
+            </div>
+            <div class="row-val">${f.pct}%</div>
+            <button class="det-btn" title="Ver detalhamento"
+              onclick="openDet('scn','${s.id}|${fi}')">
+              <i class="ph ph-arrows-out-simple"></i></button>
+          </div></div>`).join('')}
+        ${r.examples && r.examples.length ? `
+          <div class="lbl">Exemplos reais</div>
+          ${r.examples.map(x=>`<div class="quote">“${x.txt}”<span class="src-l">${x.src}</span></div>`).join('')}` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function callSeal(n){
+  if(!cur.ia.blocks.calls) return '';
+  return '<span class="sep"></span>' + (n
+    ? `<span class="seal"><i class="ph ph-microphone"></i> Confirmado em ${n} ligações</span>`
+    : '<span class="seal none"><i class="ph ph-microphone-slash"></i> Não confirmado em ligações</span>');
+}
+
+function reportBlock(){
+  const a=cur.ia.analyses.find(x=>x.id===curAn);
+  if(!a) return '';
+  const r=REPORT;
+  const eff=v=>v>=60?'ok':(v>=45?'warn':'err');
+  /* atendimentos automáticos = conversas que a jornada resolveu sem transbordo */
+  const auto    = r.coverage.conversations - r.coverage.humanTotal;
+  const autoPct = Math.round(auto / r.coverage.conversations * 100);
+
+  return `
+  <div class="rep-hero">
+    <div class="rep-hero-in">
+      <div class="rep-hero-top"><i class="ph ph-sparkle"></i><h5>Resumo executivo</h5>
+        <span style="flex:1"></span>
+        <span style="font-size:11.5px;color:var(--neutral-color-low-light)">${fmt(a.start)} – ${fmt(a.end)} · gerada em ${a.at}</span></div>
+      <p>${r.summary}</p>
+    </div>
+  </div>
+
+  <div class="sec"><div class="sec-hdr" style="padding:18px 20px">
+    <div class="sec-ttl"><h4 style="font-size:16px">Cobertura da análise</h4>
+      <p>Fluxo da jornada · relatórios · conversas · atendimentos humanos por mensagem e por voz</p></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-quat btn-sm" onclick="exportRep()"><i class="ph ph-download-simple"></i> Exportar</button>
+    </div></div>
+    <div class="sec-body">
+      <div class="cov">
+        <div class="cov-i"><div class="cov-l"><i class="ph ph-chats-circle"></i> Conversas</div>
+          <div class="cov-v">${r.coverage.conversations.toLocaleString('pt-BR')}</div></div>
+        <div class="cov-i"><div class="cov-l"><i class="ph ph-robot"></i> Atendimentos automáticos</div>
+          <div class="cov-v">${auto.toLocaleString('pt-BR')}</div>
+          <div class="cov-h">${autoPct}% resolvidos sem transbordo</div></div>
+        <div class="cov-i"><div class="cov-l"><i class="ph ph-headset"></i> Atendimentos humanos</div>
+          <div class="cov-v">${r.coverage.humanTotal}</div>
+          <div class="cov-h">${r.coverage.humanText} mensagem · ${r.coverage.humanVoice} voz</div></div>
+        <div class="cov-i"><div class="cov-l"><i class="ph ph-microphone"></i> Ligações analisadas</div>
+          <div class="cov-v">${r.coverage.calls}</div>
+          <div class="cov-h">Via transcrição · ${r.coverage.callsSkipped} sem transcrição, desconsideradas</div></div>
+      </div>
+    </div>
+  </div>
+
+  ${a.hasPrev?`
+  <div class="sec"><div class="sec-hdr" style="padding:18px 20px">
+    <div class="sec-ttl"><h4 style="font-size:16px">Comparativo com a execução anterior</h4>
+      <p>Evolução das perguntas e dos argumentos</p></div></div>
+    <div class="sec-body"><div class="cov" style="grid-template-columns:repeat(3,1fr)">
+      ${r.comparison.map(c=>`
+        <div class="cov-i"><div class="cov-l">${c.label}</div>
+          <div class="cov-v">${c.cur}
+            <span class="ia-delta" style="font-size:12px;margin-left:6px;color:${c.dir==='up'?'var(--feedback-color-success-dark)':'var(--feedback-color-warning-dark)'}">
+              <i class="ph ${c.dir==='up'?'ph-trend-up':'ph-trend-down'}"></i> ${c.note}</span></div>
+          <div class="cov-h">Anterior: ${c.prev}</div></div>`).join('')}
+    </div></div>
+  </div>`:''}
+
+  ${cur.ia.blocks.faq?`
+  <div class="sec"><div class="sec-hdr" style="padding:18px 20px">
+    <div class="sec-ttl"><h4 style="font-size:16px">Perguntas mais frequentes dos contatos</h4>
+      <p>Agrupadas por tema, com volume, percentual e exemplos reais</p></div></div>
+    <div class="sec-body" style="gap:10px">
+      ${r.themes.map((t,i)=>`
+        <div class="row" id="T${i}">
+          <div class="row-hdr" onclick="rowT('T${i}')">
+            <div class="row-main">
+              <div class="row-ttl">${t.name}
+                ${t.gap?'<span class="seal gap"><i class="ph ph-warning"></i> Sem resposta no fluxo</span>':''}</div>
+              <div class="row-meta"><span>${t.volume} menções</span>${callSeal(t.calls)}</div>
+              <div class="bar"><span style="width:${t.pct}%"></span></div>
+            </div>
+            <div class="row-val">${t.pct}%</div>
+            <button class="det-btn" title="Ver detalhamento"
+              onclick="event.stopPropagation();openDet('theme','${t.name.replace(/'/g,"\\'")}')">
+              <i class="ph ph-arrows-out-simple"></i></button>
+            <i class="ph ph-caret-down row-caret"></i>
+          </div>
+          <div class="row-body">
+            <div class="lbl">Exemplos reais</div>
+            ${t.examples.map(x=>`<div class="quote">“${x.txt}”<span class="src-l">${x.src}</span></div>`).join('')}
+          </div>
+        </div>`).join('')}
+    </div>
+  </div>`:''}
+
+  ${cur.ia.blocks.args?`
+  <div class="sec"><div class="sec-hdr" style="padding:18px 20px">
+    <div class="sec-ttl"><h4 style="font-size:16px">Argumentos utilizados pelos atendentes</h4>
+      <p>Eficácia calculada pelo desfecho dos atendimentos em que o argumento foi utilizado</p></div></div>
+    <div class="sec-body" style="gap:10px">
+      ${r.args.map((g,i)=>`
+        <div class="row" id="A${i}">
+          <div class="row-hdr" onclick="rowT('A${i}')">
+            <div class="row-main">
+              <div class="row-ttl">${g.name}</div>
+              <div class="row-meta"><span>${g.uses} usos</span>${callSeal(g.calls)}</div>
+              <div class="bar ${eff(g.eff)}"><span style="width:${g.eff}%"></span></div>
+            </div>
+            <div class="row-val">${g.eff}%</div>
+            <button class="det-btn" title="Ver detalhamento"
+              onclick="event.stopPropagation();openDet('arg','${g.name.replace(/'/g,"\\'")}')">
+              <i class="ph ph-arrows-out-simple"></i></button>
+            <i class="ph ph-caret-down row-caret"></i>
+          </div>
+          <div class="row-body">
+            <div class="lbl">Desfechos dos atendimentos</div>
+            <div class="outs">
+              <div class="out"><div class="out-l">Acordo fechado</div><div class="out-v">${g.outcomes.deal}</div></div>
+              <div class="out"><div class="out-l">Retorno agendado</div><div class="out-v">${g.outcomes.callback}</div></div>
+              <div class="out"><div class="out-l">Recusa</div><div class="out-v">${g.outcomes.refusal}</div></div>
+            </div>
+            <div class="quote" style="font-style:normal">${g.note}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+  </div>`:''}
+
+  ${cur.ia.blocks.sugg?`
+  <div class="sec"><div class="sec-hdr" style="padding:18px 20px">
+    <div class="sec-ttl"><h4 style="font-size:16px">Sugestões de melhoria na jornada</h4>
+      <p>Perguntas frequentes sem resposta automática no fluxo</p></div></div>
+    <div class="sec-body" style="gap:10px">
+      ${r.suggestions.map(s=>`
+        <div class="sugg">
+          <div class="sugg-ico"><i class="ph ph-lightbulb"></i></div>
+          <div style="flex:1;min-width:0">
+            <div class="sugg-t">${s.title}</div>
+            <div class="sugg-d">${s.desc}</div>
+            <!-- a sugestão aponta para o nó do fluxo, na aba ao lado -->
+            <div class="node go" onclick="jrTab('dados')"><i class="ph ph-flow-arrow"></i> ${s.node}
+              <i class="ph ph-arrow-up-right" style="font-size:11px"></i></div>
+          </div>
+          <button class="det-btn" title="Ver detalhamento"
+            onclick="openDet('sugg','${s.title.replace(/'/g,"\\'")}')">
+            <i class="ph ph-arrows-out-simple"></i></button>
+        </div>`).join('')}
+    </div>
+  </div>`:''}
+
+  ${scenarioBlocks(a)}
+
+  ${cur.ia.xps.length?`
+  <div class="sec"><div class="sec-hdr" style="padding:18px 20px">
+    <div class="sec-ttl"><h4 style="font-size:16px">Informações coletadas em variáveis</h4>
+      <p>Extraídas durante esta geração, a partir dos prompts fixos da jornada</p></div></div>
+    <div class="sec-body" style="gap:10px">
+      ${cur.ia.xps.map((x,xi)=>{
+        const v=VARIABLES.find(y=>y.id===x.varId);
+        const st=x.stats||{analyzed:0,filled:0};
+        const pct=st.analyzed?Math.round(st.filled/st.analyzed*100):0;
+        return `<div class="row" id="X${xi}">
+          <div class="row-hdr" onclick="rowT('X${xi}')">
+            <div class="row-main">
+              <div class="row-ttl">“${x.prompt}”</div>
+              <div class="row-meta">
+                <span class="code">${v?v.code:'—'}</span><span class="sep"></span>
+                <span>${st.filled.toLocaleString('pt-BR')} de ${st.analyzed.toLocaleString('pt-BR')} conversas preencheram</span>
+              </div>
+              <div class="bar"><span style="width:${pct}%"></span></div>
+            </div>
+            <div class="row-val">${pct}%</div>
+            <button class="det-btn" title="Ver detalhamento"
+              onclick="event.stopPropagation();openDet('var','${x.id}')">
+              <i class="ph ph-arrows-out-simple"></i></button>
+            <i class="ph ph-caret-down row-caret"></i>
+          </div>
+          <div class="row-body">
+            ${(x.top&&x.top.length)?`
+              <div class="lbl">Valores mais frequentes</div>
+              ${x.top.slice(0,3).map(t=>`
+                <div class="det-line">
+                  <div class="det-line-m">
+                    <div class="det-line-t">${t.v}</div>
+                    <div class="bar"><span style="width:${Math.round(t.n/st.filled*100)}%"></span></div>
+                  </div>
+                  <div class="det-line-v">${t.n}</div>
+                </div>`).join('')}`:''}
+            <div class="lbl">Amostra de contatos</div>
+            ${x.fills.slice(0,3).map(f=>`
+              <div style="display:flex;align-items:center;gap:10px;font-size:12.5px;background:var(--background-color-light);border-radius:var(--r-sm);padding:7px 10px;margin-top:6px">
+                <span style="color:var(--neutral-color-low-medium);min-width:150px">${f.who}</span>
+                ${f.val?`<span style="flex:1;font-weight:500">${f.val}</span><span class="ai-src"><i class="ph ph-sparkle"></i> Preenchido por IA</span>`
+                       :`<span style="flex:1;color:var(--neutral-color-low-light);font-style:italic">Não encontrado na conversa — variável permanece vazia</span>`}
+              </div>`).join('')}
+            ${x.fills.length>3?`<div style="font-size:11.5px;color:var(--neutral-color-low-light);margin-top:9px">
+              Mostrando 3 de ${x.fills.length} da amostra — abra o detalhamento para ver a lista completa.</div>`:''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`:''}
+
+  <div class="info-banner">
+    <i class="ph ph-sparkle"></i>
+    <span>Os argumentos de maior eficácia desta análise ficam disponíveis como sugestão para a personalização do prompt do assistente de IA do operador no Chat.</span>
+  </div>
+
+  `;
+}
+
+/* ════════════════════════════════════════════════════════════
+   DETALHAMENTO EM MODAL — vale para todos os cards do relatório
+════════════════════════════════════════════════════════════ */
+function closeDet(){ document.getElementById('detModal').classList.remove('open'); }
+
+function openDet(kind, key){
+  const a = cur.ia.analyses.find(x=>x.id===curAn); if(!a) return;
+  const r = REPORT;
+  const built = {theme:detTheme, arg:detArg, sugg:detSugg, scn:detScn, var:detVar}[kind](key, r, a);
+  if(!built) return;
+
+  document.getElementById('detKind').innerHTML  = `<i class="ph ${built.icon}"></i> ${built.kind}`;
+  document.getElementById('detTitle').textContent = built.title;
+  document.getElementById('detBody').innerHTML  = built.body;
+  document.getElementById('detScope').textContent = `${cur.name} · ${fmt(a.start)} – ${fmt(a.end)}`;
+  document.getElementById('detModal').classList.add('open');
+}
+
+/* blocos reutilizados pelas modais */
+function detMetrics(items){
+  return `<div class="det-grid">${items.map(m=>`
+    <div class="det-m"><div class="det-m-l">${m.l}</div><div class="det-m-v">${m.v}</div>
+      ${m.h?`<div class="det-m-h">${m.h}</div>`:''}</div>`).join('')}</div>`;
+}
+function detSection(title, inner){
+  return `<div><div class="det-sec-t">${title}</div>${inner}</div>`;
+}
+function detLines(rows, total){
+  return rows.map(x=>`
+    <div class="det-line">
+      <div class="det-line-m">
+        <div class="det-line-t">${x.t}</div>
+        <div class="bar"><span style="width:${Math.round(x.n/total*100)}%"></span></div>
+      </div>
+      <div class="det-line-v">${x.n}<span style="color:var(--neutral-color-low-light);font-weight:400"> · ${Math.round(x.n/total*100)}%</span></div>
+    </div>`).join('');
+}
+function detQuotes(list){
+  return list.map(x=>`<div class="quote">“${x.txt||x.q}”${x.src?`<span class="src-l">${x.src}</span>`:''}</div>`).join('');
+}
+
+/* ── Tema de pergunta frequente ── */
+function detTheme(name, r, a){
+  const t = r.themes.find(x=>x.name===name); if(!t) return null;
+  /* derivados do próprio recorte, para não divergir dos números do card */
+  const voice = Math.round(t.volume * r.coverage.humanVoice / r.coverage.humanTotal);
+  const text  = t.volume - voice;
+  const esc   = t.gap ? t.volume : Math.round(t.volume * 0.34);
+  const solved= t.volume - esc;
+  const uniq  = Math.round(t.volume * 0.86);
+
+  return {
+    kind:'Pergunta frequente', icon:'ph-question', title:t.name,
+    body:
+      detMetrics([
+        {l:'Menções no período', v:t.volume, h:`${t.pct}% do total`},
+        {l:'Contatos distintos', v:uniq},
+        {l:'Confirmado em ligações', v:t.calls || '—', h:t.calls?'via transcrição':'não confirmado'},
+        {l:'Resolvido pelo fluxo', v:`${Math.round(solved/t.volume*100)}%`, h:`${esc} transbordaram`},
+      ])
+      + (t.gap ? `<div class="modal-alert warn"><i class="ph ph-warning"></i>
+          <span>Este tema não tem resposta automática no fluxo — todos os ${t.volume} contatos foram
+          transbordados para atendimento humano.</span></div>` : '')
+      + detSection('Como o contato pergunta', detLines((t.variants||[]).map(v=>({t:v.q, n:v.n})), t.volume))
+      + detSection('Onde apareceu', `<div class="det-split">
+          <div class="det-half"><div class="det-line"><div class="det-line-m">
+            <div class="det-line-t">Por mensagem</div>
+            <div class="bar"><span style="width:${Math.round(text/t.volume*100)}%"></span></div>
+          </div><div class="det-line-v">${text}</div></div></div>
+          <div class="det-half"><div class="det-line"><div class="det-line-m">
+            <div class="det-line-t">Por voz</div>
+            <div class="bar sec"><span style="width:${Math.round(voice/t.volume*100)}%"></span></div>
+          </div><div class="det-line-v">${voice}</div></div></div>
+        </div>`)
+      + detSection('Exemplos reais', detQuotes(t.examples)),
+  };
+}
+
+/* ── Argumento de atendente ── */
+function detArg(name, r, a){
+  const g = r.args.find(x=>x.name===name); if(!g) return null;
+  const tot = g.outcomes.deal + g.outcomes.callback + g.outcomes.refusal;
+  return {
+    kind:'Argumento do atendente', icon:'ph-chat-teardrop-text', title:g.name,
+    body:
+      detMetrics([
+        {l:'Usos no período', v:g.uses},
+        {l:'Eficácia', v:`${g.eff}%`, h:'acordos sobre usos'},
+        {l:'Confirmado em ligações', v:g.calls || '—', h:g.calls?'via transcrição':'não confirmado'},
+        {l:'Posição no ranking', v:`${r.args.indexOf(g)+1}º`, h:`de ${r.args.length}`},
+      ])
+      + detSection('Desfecho dos atendimentos', detLines([
+          {t:'Acordo fechado',   n:g.outcomes.deal},
+          {t:'Retorno agendado', n:g.outcomes.callback},
+          {t:'Recusa',           n:g.outcomes.refusal},
+        ], tot))
+      + detSection('Temas em que aparece',
+          `<div class="det-tags">${(g.inThemes||[]).map(x=>`<span class="det-tag">${x}</span>`).join('')}</div>`)
+      + detSection('Trechos reais', detQuotes(g.snippets||[]))
+      + `<div class="modal-alert info"><i class="ph ph-sparkle"></i><span>${g.note}</span></div>`,
+  };
+}
+
+/* ── Sugestão de melhoria ── */
+function detSugg(title, r, a){
+  const s = r.suggestions.find(x=>x.title===title); if(!s) return null;
+  /* liga a sugestão ao tema que a originou */
+  const t = r.themes.find(x=>s.desc.includes(String(x.volume)));
+  return {
+    kind:'Sugestão de melhoria', icon:'ph-lightbulb', title:s.title,
+    body:
+      (t ? detMetrics([
+        {l:'Contatos afetados', v:t.volume, h:`${t.pct}% do período`},
+        {l:'Transbordos evitáveis', v:t.gap ? t.volume : Math.round(t.volume*0.34)},
+        {l:'Confirmado em ligações', v:t.calls || '—'},
+        {l:'Tema de origem', v:t.pct+'%', h:t.name},
+      ]) : '')
+      + detSection('O que a IA observou', `<p style="font-size:13.5px;line-height:1.6;color:var(--neutral-color-low-medium)">${s.desc}</p>`)
+      + detSection('Onde aplicar no fluxo',
+          `<div class="node go" onclick="closeDet();jrTab('dados')"><i class="ph ph-flow-arrow"></i> ${s.node}
+            <i class="ph ph-arrow-up-right" style="font-size:11px"></i></div>`)
+      + (t ? detSection('Perguntas que motivaram a sugestão', detQuotes(t.examples)) : ''),
+  };
+}
+
+/* ── Grupo de uma análise personalizada ── */
+function detScn(key, r, a){
+  const [sid, idx] = key.split('|');
+  const s = cur.ia.scenarios.find(x=>x.id===sid); if(!s) return null;
+  const res = SCENARIO_RESULTS[s.id] || genericScenario(s);
+  const f = res.findings[+idx]; if(!f) return null;
+  return {
+    kind:'Análise personalizada', icon:'ph-magic-wand', title:f.label,
+    body:
+      detMetrics([
+        {l:'Ocorrências', v:f.n, h:`${f.pct}% do grupo`},
+        {l:'Base analisada', v:res.total, h:'conversas com sinal'},
+        {l:'Análise', v:s.name},
+        {l:'Origem', v:'IA', h:'definida por prompt'},
+      ])
+      + detSection('Prompt que originou esta análise',
+          `<div class="quote" style="font-style:normal">“${s.desc}”</div>`)
+      + detSection('Distribuição completa', detLines(res.findings.map(x=>({t:x.label, n:x.n})), res.total))
+      + (res.examples && res.examples.length ? detSection('Exemplos reais', detQuotes(res.examples)) : ''),
+  };
+}
+
+/* ── Variável coletada por prompt fixo ── */
+function detVar(id, r, a){
+  const x = cur.ia.xps.find(y=>y.id===id); if(!x) return null;
+  const v  = VARIABLES.find(y=>y.id===x.varId);
+  const st = x.stats||{analyzed:0, filled:0};
+  const empty = st.analyzed - st.filled;
+  const pct = st.analyzed?Math.round(st.filled/st.analyzed*100):0;
+
+  return {
+    kind:'Coleta em variável', icon:'ph-brackets-curly', title:v?v.label:'Variável',
+    body:
+      detMetrics([
+        {l:'Conversas analisadas', v:st.analyzed.toLocaleString('pt-BR')},
+        {l:'Variável preenchida', v:st.filled.toLocaleString('pt-BR'), h:`${pct}% das conversas`},
+        {l:'Permaneceu vazia', v:empty.toLocaleString('pt-BR'), h:'informação não mencionada'},
+        {l:'Variável de destino', v:v?v.code:'—'},
+      ])
+      + detSection('Prompt fixo configurado na jornada',
+          `<div class="quote" style="font-style:normal">“${x.prompt}”</div>`)
+      + ((x.top&&x.top.length)
+          ? detSection('Valores mais frequentes', detLines(x.top.map(t=>({t:t.v, n:t.n})), st.filled))
+          : '')
+      + detSection(`Amostra de contatos (${x.fills.length})`,
+          x.fills.map(f=>`
+            <div class="det-line">
+              <div class="det-line-m">
+                <div class="det-line-t">${f.who}</div>
+              </div>
+              <div style="flex:1;min-width:0;font-size:13px;text-align:right">
+                ${f.val
+                  ? `<span style="font-weight:500">${f.val}</span>
+                     <span class="ai-src" style="margin-left:8px"><i class="ph ph-sparkle"></i> Preenchido por IA</span>`
+                  : `<span style="color:var(--neutral-color-low-light);font-style:italic">Não encontrado — permanece vazia</span>`}
+              </div>
+            </div>`).join(''))
+      + `<div class="modal-alert info"><i class="ph ph-info"></i>
+          <span>Nenhum valor é inferido: quando a informação não aparece na conversa, a variável permanece vazia.
+          Valores preenchidos ficam disponíveis em jornadas, campanhas e chat, sempre com a origem “Preenchido por IA”.</span></div>`,
+  };
+}
+
+document.querySelectorAll('.modal-bg').forEach(m=>{
+  m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('open'); });
+});
+
+function rowT(id){ const el=document.getElementById(id); if(el) el.classList.toggle('open'); }
+function exportRep(){ toast('ok','Relatório exportado.'); }
+
+/* ── campo de prompt ──────────────────────────────────────────
+   INATIVO: a seção "Perguntar sobre esta análise" foi removida da UI
+   a pedido de produto (2026-09-03). O código abaixo fica preservado —
+   para reativar, basta reinserir o bloco no fim de reportBlock().
+   Atenção: o card CCM-3269 tem critério de aceite para este campo,
+   então a remoção precisa ser registrada como decisão de escopo.
+   ──────────────────────────────────────────────────────────── */
+function renderQa(a){
+  if(!a.qa.length){
+    return `<div class="msg"><div class="msg-av"><i class="ph ph-sparkle"></i></div>
+      <div><div class="bub">Pergunte o que quiser sobre esta análise. Respondo apenas com base nos dados desta jornada no período selecionado.</div></div></div>`;
+  }
+  return a.qa.map(m=>`
+    <div class="msg ${m.role==='me'?'me':''}">
+      <div class="msg-av">${m.role==='me'?'SS':'<i class="ph ph-sparkle"></i>'}</div>
+      <div><div class="bub">${m.text}</div><div class="msg-t" style="${m.role==='me'?'text-align:right':''}">${m.time}</div></div>
+    </div>`).join('');
+}
+
+function chipAsk(el){ document.getElementById('askInput').value=el.textContent.trim(); ask(); }
+
+function ask(){
+  const inp=document.getElementById('askInput');
+  const q=(inp.value||'').trim(); if(!q) return;
+  const a=cur.ia.analyses.find(x=>x.id===curAn); if(!a) return;
+  a.qa.push({role:'me', text:q, time:hhmm()});
+  inp.value='';
+  const chat=document.getElementById('chat');
+  chat.innerHTML = renderQa(a) + `<div class="msg"><div class="msg-av"><i class="ph ph-sparkle"></i></div>
+    <div class="bub"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
+  setTimeout(()=>{
+    a.qa.push({role:'ia', text:answer(q,a), time:hhmm()});
+    const c=document.getElementById('chat');
+    if(c) c.innerHTML = renderQa(a);
+  },1100);
+}
+
+/* Respostas restritas ao recorte: esta jornada + este período */
+function answer(q,a){
+  const s=q.toLowerCase(), r=REPORT;
+
+  const otherJourney = JOURNEYS.some(j=>j.id!==cur.id && s.includes(j.name.toLowerCase().slice(0,8)))
+    || /outra jornada|todas as jornadas|renova[çc]|onboarding|compare com a jornada|m[êe]s passado|outro per[íi]odo/.test(s);
+  if(otherJourney){
+    return `Não há dados disponíveis para esse recorte. Esta análise contempla somente a jornada <strong>${cur.name}</strong> entre ${fmt(a.start)} e ${fmt(a.end)}. Para outra jornada, abra a aba IA Panorâmica dela.`;
+  }
+  if(/argumento|efic|fecha mais|acordo/.test(s)){
+    const t=r.args[0];
+    return `O argumento de maior eficácia é <strong>“${t.name}”</strong>, com ${t.eff}% de acordos em ${t.uses} usos (${t.outcomes.deal} acordos, ${t.outcomes.callback} retornos agendados, ${t.outcomes.refusal} recusas). Confirmado em ${t.calls} ligações.
+      <ul><li>${r.args[1].name} — ${r.args[1].eff}%</li><li>${r.args[2].name} — ${r.args[2].eff}%</li></ul>`;
+  }
+  if(/negativ|serasa|restri/.test(s)){
+    const t=r.themes.find(x=>/negativ/i.test(x.name));
+    return `Negativação e Serasa aparecem em <strong>${t.volume} menções (${t.pct}%)</strong>, confirmadas em ${t.calls} ligações. O tema <strong>não tem resposta automática no fluxo desta jornada</strong> — todos os contatos foram transbordados para atendimento humano.`;
+  }
+  if(/ligaç|voz|transcri|áudio|audio/.test(s)){
+    return `Foram analisadas <strong>${r.coverage.calls} ligações</strong> pela transcrição automática já disponível nos relatórios. Outras <strong>${r.coverage.callsSkipped}</strong> não tinham transcrição e foram desconsideradas.`;
+  }
+  if(/pergunt|dúvida|duvida|tema|frequen/.test(s)){
+    return `Os temas mais frequentes:<ul>${r.themes.slice(0,4).map(t=>`<li>${t.name} — ${t.volume} menções (${t.pct}%)</li>`).join('')}</ul>Negativação e parcelamento no cartão não têm resposta automática no fluxo.`;
+  }
+  if(/melhor|sugest|fluxo|otimiz/.test(s)){
+    return `A recomendação de maior impacto: <strong>${r.suggestions[0].title.toLowerCase()}</strong>. ${r.suggestions[0].desc} Ponto indicado no fluxo: <strong>${r.suggestions[0].node}</strong>.`;
+  }
+  if(/vari|extra|coleta/.test(s)){
+    if(!cur.ia.xps.length) return 'Esta jornada não tem prompts fixos de extração configurados. Você pode adicioná-los na aba Dados da jornada, no cartão da IA Panorâmica.';
+    return `Esta jornada tem ${cur.ia.xps.length} prompt(s) de extração. Os valores encontrados aparecem no bloco “Informações coletadas em variáveis”, sempre com a origem “Preenchido por IA”.`;
+  }
+  return `Nesta análise de <strong>${cur.name}</strong> (${fmt(a.start)} – ${fmt(a.end)}), o tema dominante é <strong>${r.themes[0].name.toLowerCase()}</strong> (${r.themes[0].pct}%) e o argumento mais eficaz é <strong>“${r.args[0].name}”</strong> (${r.args[0].eff}%).`;
+}
+
+/* ════════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════════ */
+initModoPill();
+showList();
+</script>
+</body>
+</html>

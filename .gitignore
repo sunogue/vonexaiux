@@ -1,0 +1,6 @@
+# configuração local da sessão
+.claude/
+.DS_Store
+
+# artefatos da Vercel
+.vercel

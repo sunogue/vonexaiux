@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/simplificada", "destination": "/jornada.html?modo=simplificada" },
+    { "source": "/completa",     "destination": "/jornada.html?modo=completa" }
+  ]
+}
