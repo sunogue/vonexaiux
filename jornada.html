@@ -1011,6 +1011,7 @@
                             <option value="diario" selected>Diário</option>
                             <option value="semanal">Semanal</option>
                             <option value="quinzenal">Quinzenal</option>
+                            <option value="mensal">Mensal</option>
                           </select>
                           <i class="ph ph-caret-down"></i>
                         </div>
@@ -1510,6 +1511,7 @@ function renderRecurHint(){
     diario:'Roda toda madrugada sobre o dia anterior. É a periodicidade que dá tempo de reagir.',
     semanal:'Roda uma vez por semana sobre os 7 dias anteriores.',
     quinzenal:'Roda a cada 15 dias sobre o período anterior.',
+    mensal:'Roda uma vez por mês sobre os 30 dias anteriores — o limite por análise.',
   }[f.value]||'';
   const el=document.getElementById('recurHint');
   if(el) el.textContent=txt;
