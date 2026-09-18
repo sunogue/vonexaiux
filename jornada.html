@@ -544,7 +544,27 @@
   background:var(--background-color-light);border-radius:var(--r-pill);
   padding:2px 9px;font-size:10.5px;
 }
-.exp-group{display:flex;gap:6px;}
+/* ── Exportar com opções de formato ── */
+.exp{position:relative;flex-shrink:0;}
+.exp-menu{
+  position:absolute;top:calc(100% + 6px);right:0;z-index:20;
+  background:var(--background-color-lightest);
+  border:1px solid var(--neutral-color-high-medium);border-radius:var(--r-md);
+  box-shadow:var(--shadow-lg);padding:6px;min-width:208px;display:none;
+}
+.exp-menu.open{display:block;}
+.exp-opt{
+  display:flex;align-items:center;gap:11px;width:100%;
+  padding:9px 10px;border:none;background:none;border-radius:var(--r-sm);
+  text-align:left;transition:background .1s;
+}
+.exp-opt:hover{background:var(--neutral-color-high-light);}
+.exp-opt > i{font-size:19px;flex-shrink:0;}
+.exp-opt .pdf{color:#d6352a;}
+.exp-opt .xls{color:#1f7244;}
+.exp-opt > span{display:block;min-width:0;}
+.exp-opt-t{display:block;font-size:13px;color:var(--neutral-color-low-pure);font-weight:500;}
+.exp-opt-s{display:block;font-size:11px;color:var(--neutral-color-low-light);margin-top:2px;line-height:1.4;}
 .gerar-scope{
   display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;
   font-size:12px;color:var(--neutral-color-low-medium);
@@ -1877,6 +1897,24 @@ function renderReportCol(){
         </div>
       </div>
       ${badge}
+      <!-- Reunião 17/09 — decisão 10: exportação em PDF e planilha -->
+      <div class="exp">
+        <button class="btn btn-quat btn-sm" onclick="toggleExp(event)">
+          <i class="ph ph-download-simple"></i> Exportar <i class="ph ph-caret-down" style="font-size:11px"></i>
+        </button>
+        <div class="exp-menu" id="expMenu">
+          <button class="exp-opt" onclick="exportRep('pdf')">
+            <i class="ph ph-file-pdf pdf"></i>
+            <span><span class="exp-opt-t">PDF</span>
+              <span class="exp-opt-s">Relatório formatado, para leitura e envio</span></span>
+          </button>
+          <button class="exp-opt" onclick="exportRep('xlsx')">
+            <i class="ph ph-file-xls xls"></i>
+            <span><span class="exp-opt-t">Planilha (Excel)</span>
+              <span class="exp-opt-s">Dados em colunas, para cruzar e filtrar</span></span>
+          </button>
+        </div>
+      </div>
     </div>
     ${reportBlock()}`;
   el.scrollTop = 0;
@@ -2227,9 +2265,30 @@ document.querySelectorAll('.modal-bg').forEach(m=>{
   m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('open'); });
 });
 
+/* ── Exportar: PDF ou planilha (decisão 10) ── */
+function toggleExp(e){
+  e.stopPropagation();
+  const m=document.getElementById('expMenu');
+  if(!m) return;
+  const abrir = !m.classList.contains('open');
+  m.classList.toggle('open', abrir);
+  if(abrir) setTimeout(()=>document.addEventListener('click', fechaExp, {once:true}), 0);
+}
+function fechaExp(){
+  const m=document.getElementById('expMenu');
+  if(m) m.classList.remove('open');
+}
+function exportRep(fmt){
+  fechaExp();
+  const a=cur.ia.analyses.find(x=>x.id===curAn);
+  const per = a ? `${fmt2(a.start)}_${fmt2(a.end)}` : '';
+  toast('ok', fmt==='xlsx'
+    ? `Planilha gerada: ${cur.name}_${per}.xlsx`
+    : `PDF gerado: ${cur.name}_${per}.pdf`);
+}
+function fmt2(iso){ return iso ? iso.split('-').reverse().join('') : ''; }
+
 function rowT(id){ const el=document.getElementById(id); if(el) el.classList.toggle('open'); }
-/* Reunião 17/09 — decisão 10: PDF e planilha */
-function exportRep(fmt){ toast('ok', fmt==='xlsx'?'Planilha exportada.':'PDF exportado.'); }
 
 /* ── campo de prompt ──────────────────────────────────────────
    INATIVO: a seção "Perguntar sobre esta análise" foi removida da UI
