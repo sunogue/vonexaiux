@@ -32,11 +32,15 @@ comparativo com a execução anterior — só faz sentido com períodos iguais.
 **Ficou:** sugestões de melhoria como única análise fixa e automática, lendo o
 objetivo do agente; análises personalizadas em texto livre; chat sobre os dados.
 
-**Entrou:** escopo por operação além de jornada; recorrência diária; envio do
+**Entrou:** recorrência diária; envio do
 relatório em PDF por e-mail; exportação em PDF e planilha; modal ao gerar para
 desmarcar análises; botão de ver exemplo do que é gerado; e, no chat, quando o
 dado não existe a IA oferece incluí-lo a partir do próximo processamento —
 virando uma análise da jornada.
+
+**Adiado:** o escopo por operação (decisão 1) saiu da tela — por ora toda
+análise é de uma jornada só. A decisão continua valendo para depois; o desenho
+que chegou a existir está no commit 7cf6308.
 
 **Continua em aberto:** a cobertura ("1.284 conversas · 412 atendimentos…") ficou
 como uma linha de rastreabilidade sob o resumo executivo, não como bloco de

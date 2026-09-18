@@ -962,15 +962,6 @@
                       Cada análise cobre um período de até 30 dias.</span>
                   </div>
 
-                  <!-- ══ Escopo: a jornada ou a operação inteira ══ -->
-                  <!-- Reunião 17/09 — decisão 1: a análise precisa contemplar também a operação -->
-                  <div class="ia-sub">
-                    <div class="ia-sub-ttl"><i class="ph ph-crosshair"></i> Escopo da análise</div>
-                    <p>A operação reúne jornadas relacionadas do mesmo cliente. Analisar a operação
-                      cruza todas elas num relatório só.</p>
-                    <div class="opts" id="scopeOpts"></div>
-                  </div>
-
                   <!-- ══ Análise automática — única fixa que permaneceu ══ -->
                   <!-- Reunião 17/09 — decisão 5: sugestões de melhoria é automática -->
                   <div class="ia-sub">
@@ -1165,15 +1156,9 @@
    jornada em lugar nenhum. O usuário escolhe apenas o período.
 ════════════════════════════════════════════════════════════ */
 
-/* ── Operações: conjuntos de jornadas relacionadas do mesmo cliente ──
-   Reunião 17/09 (decisão 1): o foco é jornada, mas a análise precisa
-   contemplar a operação. Hoje a maioria dos clientes tem jornada única
-   por operação; Conark e Besni são as exceções com várias. */
-const OPERACOES = [
-  {id:'op1', name:'Cobrança Syscob', journeys:['j1','j2']},
-  {id:'op2', name:'Ativação Besni',  journeys:['j3','j4','j5']},
-];
-function opDe(journeyId){ return OPERACOES.find(o=>o.journeys.includes(journeyId)); }
+/* Escopo por operação (conjunto de jornadas) foi levantado na reunião de
+   17/09 como necessário, mas fica para depois: por ora toda análise é de
+   uma jornada só. O histórico está em git (commit 7cf6308). */
 
 /* ── Jornadas ── */
 const JOURNEYS = [
@@ -1181,7 +1166,7 @@ const JOURNEYS = [
    runs:1, version:'00005', trigger:'Receber mensagem', uid:'6a948712d1fbfd44b99d6711',
    convPerDay:43,
    ia:{enabled:true, recurring:true, freq:'diario',
-       escopo:'jornada', mails:['lucas.rehem@vonex.com.br'],
+       mails:['lucas.rehem@vonex.com.br'],
        scenarios:[
          {id:'s1', on:true, name:'Motivo da recusa da proposta',
           desc:'Identificar por que o contato recusou a proposta de acordo: valor da parcela alto, desconfiança na empresa, dívida já paga, ou indisponibilidade financeira no momento.'},
@@ -1195,22 +1180,22 @@ const JOURNEYS = [
    runs:0, version:'00002', trigger:'Enviar mensagem no WhatsApp', uid:'6a9459eb9727e1273fc168b2',
    convPerDay:28,
    ia:{enabled:true, recurring:false, freq:'diario',
-       escopo:'jornada', mails:[], scenarios:[],
+       mails:[], scenarios:[],
        analyses:[
          {id:'b1', start:'2026-08-10', end:'2026-08-28', at:'28/08/2026 17:44', user:'Camila Alves', type:'manual', status:'falha', hasPrev:false, qa:[]},
        ]}},
 
   {id:'j3', ini:'AA', name:'Jornada Duplicada - Teste de vínculo', status:'Ativo', date:'30/08/2026 às 04:37',
    runs:0, version:'00001', trigger:'Enviar mensagem no WhatsApp', uid:'6a93dd9e9727e1273fc15589',
-   convPerDay:11, ia:{enabled:false, recurring:false, freq:'diario', escopo:'jornada', mails:[], scenarios:[], analyses:[]}},
+   convPerDay:11, ia:{enabled:false, recurring:false, freq:'diario', mails:[], scenarios:[], analyses:[]}},
 
   {id:'j4', ini:'AA', name:'Validação - Jornada Voz', status:'Ativo', date:'30/08/2026 às 04:28',
    runs:1, version:'00001', trigger:'Enviar A.I. Voice', uid:'6a93dba79727e1273fc15585',
-   convPerDay:9, ia:{enabled:false, recurring:false, freq:'diario', escopo:'jornada', mails:[], scenarios:[], analyses:[]}},
+   convPerDay:9, ia:{enabled:false, recurring:false, freq:'diario', mails:[], scenarios:[], analyses:[]}},
 
   {id:'j5', ini:'AA', name:'Vínculo de Jornada - Teste', status:'Ativo', date:'30/08/2026 às 04:24',
    runs:0, version:'00001', trigger:'Enviar mensagem no WhatsApp', uid:'6a93da959727e1273fc15583',
-   convPerDay:6, ia:{enabled:false, recurring:false, freq:'diario', escopo:'jornada', mails:[], scenarios:[], analyses:[]}},
+   convPerDay:6, ia:{enabled:false, recurring:false, freq:'diario', mails:[], scenarios:[], analyses:[]}},
 ];
 
 /* ── Resultado das análises personalizadas (cenários) ── */
@@ -1420,7 +1405,7 @@ function openJourney(id, tab){
   cur = id==='new'
     ? {id:'new', ini:'NJ', name:'', status:'Rascunho', date:today(), runs:0, version:'00001',
        trigger:'Receber mensagem', uid:'—', convPerDay:20,
-       ia:{enabled:false, recurring:false, freq:'diario', escopo:'jornada', mails:[], scenarios:[], analyses:[]}}
+       ia:{enabled:false, recurring:false, freq:'diario', mails:[], scenarios:[], analyses:[]}}
     : JOURNEYS.find(x=>x.id===id);
   curAn = null; busy = false;
   setPeriod(30, true);
@@ -1443,7 +1428,6 @@ function openJourney(id, tab){
   cur.ia.mailOn = !!cur.ia.mails.length;
   document.getElementById('mailToggle').classList.toggle('on', cur.ia.mailOn);
   document.getElementById('mailOpts').style.display = cur.ia.mailOn?'flex':'none';
-  renderScope();
   renderScenarios();
   renderMails();
   renderRecurHint();
@@ -1515,22 +1499,6 @@ function initModoPill(){
     <a href="index.html">ver versões</a>`;
   document.body.appendChild(el);
 }
-
-/* ── Escopo: esta jornada ou a operação inteira ── */
-function renderScope(){
-  const op=opDe(cur.id);
-  const el=document.getElementById('scopeOpts');
-  el.innerHTML = `
-    <button class="opt ${cur.ia.escopo==='jornada'?'on':''}" onclick="setEscopo('jornada')">
-      <span class="radio"></span> <i class="ph ph-tree-structure"></i> Esta jornada
-    </button>
-    ${op?`
-      <button class="opt ${cur.ia.escopo==='operacao'?'on':''}" onclick="setEscopo('operacao')">
-        <span class="radio"></span> <i class="ph ph-stack"></i> Operação ${op.name}
-        <span class="opt-n">${op.journeys.length} jornadas</span>
-      </button>`:''}`;
-}
-function setEscopo(v){ cur.ia.escopo=v; renderScope(); }
 
 /* ── Recorrência e envio por e-mail ── */
 function renderRecurHint(){
@@ -2090,15 +2058,11 @@ function toggleGerar(k){ gerarSel[k]=!gerarSel[k]; renderGerar(); }
 
 function renderGerar(){
   const st=rangeState();
-  const op=opDe(cur.id);
-  const escopo = cur.ia.escopo==='operacao' && op
-    ? `Operação ${op.name} · ${op.journeys.length} jornadas`
-    : cur.name;
   const custom = cur.ia.scenarios.filter(s=>s.on && s.name);
   const n = Object.values(gerarSel).filter(Boolean).length;
 
   document.getElementById('gerarScope').innerHTML =
-    `<i class="ph ${cur.ia.escopo==='operacao'?'ph-stack':'ph-tree-structure'}"></i> ${escopo}
+    `<i class="ph ph-tree-structure"></i> ${cur.name}
      <span class="sep"></span> ${fmt(per.start)} – ${fmt(per.end)} (${st.d} dias)`;
 
   document.getElementById('gerarList').innerHTML = `
