@@ -131,53 +131,55 @@ body{background:var(--background-color-light);}
       <div class="hub-mark"><i class="ph ph-sparkle"></i></div>
       <h1>IA Panorâmica <em>de Jornada</em></h1>
       <p>
-        Duas versões da mesma funcionalidade, para validar até onde vai o controle
-        do usuário sobre o que a IA analisa em cada jornada.
+        A versão ajustada após a reunião de 17/09, e o registro do que foi
+        apresentado lá — para acompanhar o que foi cortado e por quê.
       </p>
       <span class="hub-card-id"><i class="ph ph-tag"></i> CCM-3269</span>
     </div>
 
     <div class="hub-cards">
 
-      <!-- ── Simplificada ── -->
-      <div class="vcard">
+      <!-- ── Versão atual ── -->
+      <div class="vcard full">
         <div class="vcard-top"></div>
         <div class="vcard-in">
-          <div class="vcard-ico"><i class="ph ph-list-checks"></i></div>
-          <span class="vcard-badge">Escopo menor</span>
-          <h2>Opção simplificada</h2>
+          <div class="vcard-ico"><i class="ph ph-sparkle"></i></div>
+          <span class="vcard-badge">Versão atual</span>
+          <h2>Ajustada na reunião de 17/09</h2>
           <p class="lead">
-            O usuário escolhe apenas as análises padrão oferecidas pelo sistema.
+            Escopo reduzido para uma POC: sai tudo o que era relatório pré-definido,
+            fica o que a IA interpreta e o que o usuário pede.
           </p>
           <div class="vcard-list">
-            <div class="vcard-li"><i class="ph ph-check-circle"></i> Seleção das análises padrão do relatório</div>
-            <div class="vcard-li"><i class="ph ph-check-circle"></i> Análise recorrente com comparativo</div>
-            <div class="vcard-li"><i class="ph ph-check-circle"></i> Coleta de informações em variáveis</div>
-            <div class="vcard-li off"><i class="ph ph-x-circle"></i> Sem análises criadas pelo usuário</div>
+            <div class="vcard-li"><i class="ph ph-check-circle"></i> Sugestões de melhoria, geradas automaticamente</div>
+            <div class="vcard-li"><i class="ph ph-check-circle"></i> Análises personalizadas em texto livre</div>
+            <div class="vcard-li"><i class="ph ph-check-circle"></i> Chat que oferece incluir o dado que falta</div>
+            <div class="vcard-li"><i class="ph ph-check-circle"></i> Escopo por jornada ou por operação</div>
+            <div class="vcard-li"><i class="ph ph-check-circle"></i> Recorrência diária e envio por e-mail</div>
           </div>
-          <button class="vcard-cta" onclick="location.href='jornada.html?modo=simplificada'">
+          <button class="vcard-cta" onclick="location.href='jornada.html'">
             Visualizar <i class="ph ph-arrow-right"></i>
           </button>
         </div>
       </div>
 
-      <!-- ── Completa ── -->
-      <div class="vcard full">
+      <!-- ── Versão apresentada ── -->
+      <div class="vcard">
         <div class="vcard-top"></div>
         <div class="vcard-in">
-          <div class="vcard-ico"><i class="ph ph-magic-wand"></i></div>
-          <span class="vcard-badge">Escopo maior</span>
-          <h2>Opção completa</h2>
+          <div class="vcard-ico"><i class="ph ph-clock-counter-clockwise"></i></div>
+          <span class="vcard-badge">Registro</span>
+          <h2>Apresentada na reunião</h2>
           <p class="lead">
-            Além das análises padrão, o usuário cria as próprias análises,
-            descrevendo por prompt o que a IA deve procurar nas conversas.
+            O que foi mostrado em 17/09, nas duas versões que motivaram as decisões.
+            Guardada para comparação.
           </p>
           <div class="vcard-list">
-            <div class="vcard-li"><i class="ph ph-check-circle"></i> Tudo o que há na versão simplificada</div>
-            <div class="vcard-li"><i class="ph ph-check-circle"></i> Análises personalizadas por nome e descrição</div>
-            <div class="vcard-li"><i class="ph ph-check-circle"></i> Cada análise vira um bloco próprio no relatório</div>
+            <div class="vcard-li off"><i class="ph ph-x-circle"></i> Perguntas frequentes e argumentos dos atendentes</div>
+            <div class="vcard-li off"><i class="ph ph-x-circle"></i> Coleta de informações em variáveis</div>
+            <div class="vcard-li off"><i class="ph ph-x-circle"></i> Comparativo com a execução anterior</div>
           </div>
-          <button class="vcard-cta" onclick="location.href='jornada.html?modo=completa'">
+          <button class="vcard-cta" onclick="location.href='jornada-apresentada.html?modo=completa'">
             Visualizar <i class="ph ph-arrow-right"></i>
           </button>
         </div>

@@ -18,18 +18,30 @@ python3 -m http.server 8901
 
 | Caminho | O que é |
 |---|---|
-| `index.html` | Tela de acesso — escolhe entre as duas versões |
-| `jornada.html?modo=simplificada` | Só as análises padrão do sistema |
-| `jornada.html?modo=completa` | Análises padrão + análises criadas pelo usuário |
+| `index.html` | Tela de acesso |
+| `jornada.html` | Versão atual — ajustada na reunião de 17/09 |
+| `jornada-apresentada.html?modo=completa` | Registro do que foi apresentado (com `?modo=simplificada` também) |
 
-As duas versões vivem no **mesmo arquivo** (`jornada.html`). O modo vem da query
-string e controla apenas uma coisa: se a seção "Análises personalizadas" existe
-na configuração da jornada e se os blocos dela aparecem no relatório. Todo o
-resto — configuração, rail de análises, relatório, detalhamentos — é o mesmo
-código, então as versões não divergem.
+## O que a reunião de 17/09 mudou
 
-Uma pílula no canto inferior esquerdo mostra qual versão está aberta e leva de
-volta à tela de acesso. É andaime de validação, não faz parte do produto.
+**Saiu:** relatórios pré-definidos (perguntas frequentes, argumentos dos
+atendentes, métricas) — cada negócio é diferente demais e boa parte já existe no
+monitoramento; coleta de informações em variáveis — sem uso claro definido;
+comparativo com a execução anterior — só faz sentido com períodos iguais.
+
+**Ficou:** sugestões de melhoria como única análise fixa e automática, lendo o
+objetivo do agente; análises personalizadas em texto livre; chat sobre os dados.
+
+**Entrou:** escopo por operação além de jornada; recorrência diária; envio do
+relatório em PDF por e-mail; exportação em PDF e planilha; modal ao gerar para
+desmarcar análises; botão de ver exemplo do que é gerado; e, no chat, quando o
+dado não existe a IA oferece incluí-lo a partir do próximo processamento —
+virando uma análise da jornada.
+
+**Continua em aberto:** a cobertura ("1.284 conversas · 412 atendimentos…") ficou
+como uma linha de rastreabilidade sob o resumo executivo, não como bloco de
+métricas. É a leitura que fiz da decisão 4, que cortou métricas pré-definidas —
+vale confirmar se era para sair por completo.
 
 ## Deploy na Vercel
 

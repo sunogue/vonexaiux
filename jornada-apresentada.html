@@ -461,46 +461,6 @@
   border-radius:var(--r-pill);padding:1px 7px;font-size:10.5px;letter-spacing:0;
 }
 
-/* ── Ajustes da reunião de 17/09 ── */
-.ia-auto{
-  display:inline-flex;align-items:center;gap:5px;
-  background:var(--brand-color-primary-lightest);color:var(--brand-color-primary-dark);
-  font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:var(--r-pill);
-}
-.ia-auto i{font-size:11px;}
-.opt-n{
-  font-size:11px;color:var(--neutral-color-low-light);
-  border-left:1px solid var(--neutral-color-high-medium);padding-left:10px;margin-left:2px;
-}
-.ia-mail{
-  border-top:1px solid var(--neutral-color-high-light);padding-top:14px;
-  display:flex;flex-direction:column;gap:10px;
-}
-.mail-chip{
-  display:inline-flex;align-items:center;gap:8px;
-  background:var(--background-color-light);border:1px solid var(--neutral-color-high-medium);
-  border-radius:var(--r-pill);padding:5px 11px;font-size:12px;color:var(--neutral-color-low-medium);
-}
-.mail-chip i{font-size:12px;cursor:pointer;color:var(--neutral-color-low-light);}
-.mail-chip i:hover{color:var(--feedback-color-warning-pure);}
-.rep-base{
-  display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:13px;
-  border-top:1px solid var(--neutral-color-high-light);
-  font-size:11.5px;color:var(--neutral-color-low-light);
-}
-.rep-base i{font-size:14px;}
-.rep-base-skip{
-  background:var(--background-color-light);border-radius:var(--r-pill);
-  padding:2px 9px;font-size:10.5px;
-}
-.exp-group{display:flex;gap:6px;}
-.gerar-scope{
-  display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;
-  font-size:12px;color:var(--neutral-color-low-medium);
-}
-.gerar-scope i{font-size:14px;color:var(--brand-color-primary-pure);}
-.gerar-scope .sep{width:3px;height:3px;border-radius:var(--r-circ);background:var(--neutral-color-high-dark);}
-
 /* ── Faixa de validação (andaime do protótipo) ── */
 .modo-pill{
   position:fixed;left:16px;bottom:16px;z-index:900;
@@ -897,8 +857,8 @@
                   <div class="ia-switch-body">
                     <div class="ia-switch-ttl">Usar a IA Panorâmica nesta jornada</div>
                     <div class="ia-switch-sub">
-                      Habilita a aba <strong>IA Panorâmica</strong>, com as sugestões de melhoria geradas
-                      pela IA, as análises que você criar e um chat sobre os dados da jornada.
+                      Habilita a aba <strong>IA Panorâmica</strong> na jornada, com as perguntas mais frequentes
+                      dos contatos, os argumentos dos atendentes e sugestões de melhoria no fluxo.
                     </div>
                   </div>
                 </div>
@@ -907,46 +867,29 @@
 
                   <div class="info-banner">
                     <i class="ph ph-info"></i>
-                    <span>A geração roda em segundo plano e você é notificado ao término.
-                      Cada análise cobre um período de até 30 dias.</span>
+                    <span>Cada análise cobre esta jornada em um período de até 30 dias. A geração roda em segundo plano e você é notificado ao término.</span>
                   </div>
 
-                  <!-- ══ Escopo: a jornada ou a operação inteira ══ -->
-                  <!-- Reunião 17/09 — decisão 1: a análise precisa contemplar também a operação -->
-                  <div class="ia-sub">
-                    <div class="ia-sub-ttl"><i class="ph ph-crosshair"></i> Escopo da análise</div>
-                    <p>A operação reúne jornadas relacionadas do mesmo cliente. Analisar a operação
-                      cruza todas elas num relatório só.</p>
-                    <div class="opts" id="scopeOpts"></div>
-                  </div>
-
-                  <!-- ══ Análise automática — única fixa que permaneceu ══ -->
-                  <!-- Reunião 17/09 — decisão 5: sugestões de melhoria é automática -->
+                  <!-- ══ Quais análises padrão a IA deve produzir ══ -->
+                  <!-- ANGULAR: formArray de blocos padrão do relatório -->
                   <div class="ia-sub">
                     <div class="ia-sub-ttl">
-                      <i class="ph ph-lightbulb"></i> Sugestões de melhoria <span class="sp"></span>
-                      <span class="ia-auto"><i class="ph ph-lock-simple"></i> Sempre incluída</span>
+                      <i class="ph ph-list-checks"></i> O que a IA deve analisar
                     </div>
-                    <p>A IA lê a descrição e o objetivo do agente, analisa o que está acontecendo na
-                      jornada e propõe melhorias. Gerada automaticamente em toda jornada com a
-                      funcionalidade habilitada.</p>
-                    <!-- Reunião 17/09 — decisão 13: mostrar um exemplo para não ficar solto -->
-                    <button class="btn btn-quat btn-sm" style="align-self:flex-start" onclick="openExemplo()">
-                      <i class="ph ph-eye"></i> Ver exemplo do que é gerado
-                    </button>
+                    <p>Selecione as análises padrão que entram no relatório desta jornada.</p>
+                    <div id="blockList" style="display:flex;flex-direction:column;gap:8px"></div>
                   </div>
 
-                  <!-- ══ Análises personalizadas ══ -->
-                  <!-- Reunião 17/09 — decisão 6: permanecem, em texto livre -->
-                  <div class="ia-sub">
+                  <!-- ══ Análises personalizadas (cenários) — só na versão completa ══ -->
+                  <!-- ANGULAR: formArray de cenários — nome + descrição para a IA -->
+                  <div class="ia-sub" id="subScenarios">
                     <div class="ia-sub-ttl">
                       <i class="ph ph-magic-wand"></i> Análises personalizadas
                     </div>
                     <p>
-                      Descreva em texto livre o que a IA deve procurar nas conversas. Vale a mesma
-                      lógica de uma conversa com IA: pergunta genérica gera resultado genérico,
-                      pergunta detalhada gera resultado detalhado. Cada análise vira um bloco próprio
-                      no relatório.
+                      Além das análises padrão, descreva o que mais a IA deve procurar nas conversas
+                      desta jornada. Cada análise recebe um nome e uma descrição objetiva do que a IA
+                      deve identificar, e vira um bloco próprio no relatório.
                     </p>
                     <div id="scnList" style="display:flex;flex-direction:column;gap:10px"></div>
                     <button class="btn-add" onclick="addScenario()">
@@ -954,44 +897,34 @@
                     </button>
                   </div>
 
-                  <!-- ══ Recorrência + envio por e-mail ══ -->
-                  <!-- Reunião 17/09 — decisões 8 e 9: mirar no diário; enviar PDF por e-mail -->
                   <div class="ia-sub">
                     <div class="ia-sub-ttl">
                       <i class="ph ph-arrows-clockwise"></i> Análise recorrente <span class="sp"></span>
                       <span class="toggle" id="recurToggle" onclick="toggleRecur()"></span>
                     </div>
-                    <p>Gera a análise automaticamente, sem precisar acionar a cada vez.</p>
-                    <div id="recurOpts" style="display:none;flex-direction:column;gap:14px">
-                      <div style="max-width:320px">
-                        <div class="sel-wrap">
-                          <select id="recurFreq" onchange="renderRecurHint()">
-                            <option value="diario" selected>Diário</option>
-                            <option value="semanal">Semanal</option>
-                            <option value="quinzenal">Quinzenal</option>
-                          </select>
-                          <i class="ph ph-caret-down"></i>
-                        </div>
-                        <div class="field-hint" id="recurHint"></div>
-                      </div>
-
-                      <div class="ia-mail">
-                        <div class="ia-sub-ttl" style="font-size:12.5px">
-                          <i class="ph ph-envelope-simple"></i> Enviar o relatório por e-mail
-                          <span class="sp"></span>
-                          <span class="toggle" id="mailToggle" onclick="toggleMail()"></span>
-                        </div>
-                        <div id="mailOpts" style="display:none;flex-direction:column;gap:10px">
-                          <p style="font-size:12.5px">O relatório vai em PDF para a lista abaixo a cada execução.</p>
-                          <div id="mailList" style="display:flex;gap:6px;flex-wrap:wrap"></div>
-                          <div style="display:flex;gap:8px;max-width:420px">
-                            <input class="ipt" id="mailInput" type="email" placeholder="nome@empresa.com.br"
-                              onkeydown="if(event.key==='Enter'){event.preventDefault();addMail();}">
-                            <button class="btn btn-sec" onclick="addMail()">Adicionar</button>
-                          </div>
-                        </div>
+                    <p>Gera a análise automaticamente e apresenta o comparativo com a execução anterior.</p>
+                    <div id="recurOpts" style="display:none">
+                      <div class="sel-wrap" style="max-width:280px">
+                        <select id="recurFreq">
+                          <option value="semanal">Semanal</option>
+                          <option value="quinzenal">Quinzenal</option>
+                          <option value="mensal" selected>Mensal (últimos 30 dias)</option>
+                        </select>
+                        <i class="ph ph-caret-down"></i>
                       </div>
                     </div>
+                  </div>
+
+                  <div class="ia-sub">
+                    <div class="ia-sub-ttl">
+                      <i class="ph ph-brackets-curly"></i> Coleta de informações em variáveis <span class="sp"></span>
+                      <button class="btn btn-sec btn-sm" onclick="openXp()"><i class="ph ph-plus"></i> Novo prompt</button>
+                    </div>
+                    <p>
+                      A IA busca a informação em qualquer ponto da conversa, independentemente do nó que a solicitaria,
+                      e grava na variável de destino. Quando não encontra, a variável permanece vazia — nenhum valor é inferido.
+                    </p>
+                    <div id="xpList" style="display:flex;flex-direction:column;gap:8px"></div>
                   </div>
 
                 </div>
@@ -1048,35 +981,40 @@
   </div>
 </div>
 
-<!-- ══ MODAL: seleção das análises antes de gerar ══ -->
-<!-- Reunião 17/09 — decisão 11: desmarcar o que não quer gerar -->
-<div class="modal-bg" id="gerarModal">
-  <div class="modal det">
-    <div class="det-hdr">
-      <div class="det-top">
-        <div style="flex:1;min-width:0">
-          <span class="det-kind"><i class="ph ph-sparkle"></i> Gerar análise</span>
-          <h4>O que entra nesta geração</h4>
-          <div class="gerar-scope" id="gerarScope"></div>
-        </div>
-        <button class="modal-close" onclick="closeGerar()"><i class="ph ph-x"></i></button>
-      </div>
+<!-- ══ MODAL: prompt fixo de extração em variável (CCM-3269) ══ -->
+<!-- ANGULAR: MatDialog.open(ExtractionPromptModalComponent) -->
+<div class="modal-bg" id="xpModal">
+  <div class="modal lg">
+    <div class="modal-hdr">
+      <h4>Prompt de extração</h4>
+      <button class="modal-close" onclick="closeXp()"><i class="ph ph-x"></i></button>
     </div>
-    <div class="det-body">
-      <p style="font-size:13px;color:var(--neutral-color-low-medium);line-height:1.6;margin-bottom:4px">
-        Desmarque o que não precisa agora. Cada análise consome processamento —
-        gerar só o necessário deixa o resultado mais rápido e mais barato.
-      </p>
-      <div id="gerarList" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div class="modal-body">
+      <p>Descreva a informação que a IA deve buscar na conversa e a variável que receberá o valor encontrado.</p>
+      <div class="ia-form">
+        <div class="field-row">
+          <label class="field-label">Prompt <span class="req"></span></label>
+          <textarea class="ipt" id="xpPrompt" rows="3" style="height:auto;padding:10px 12px;resize:vertical;font-family:inherit"
+            placeholder="Ex.: Capturar o motivo de cancelamento informado pelo contato"></textarea>
+          <div class="field-hint">A IA busca a informação em qualquer ponto da conversa.</div>
+        </div>
+        <div class="field-row">
+          <label class="field-label">Variável de destino <span class="req"></span></label>
+          <div class="sel-wrap">
+            <select id="xpTarget"></select>
+            <i class="ph ph-caret-down"></i>
+          </div>
+          <div class="field-hint">Quando a informação não é encontrada, a variável permanece vazia — nenhum valor é inferido.</div>
+        </div>
+        <div class="modal-alert info">
+          <i class="ph ph-info"></i>
+          <span>Todo valor preenchido pela IA carrega a origem “Preenchido por IA” onde a variável for exibida. Valor já existente não é sobrescrito.</span>
+        </div>
+      </div>
     </div>
     <div class="modal-ftr">
-      <span class="det-ftr-note" id="gerarCount"></span>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-quat" onclick="closeGerar()">Cancelar</button>
-        <button class="btn btn-prim" id="gerarBtn" onclick="confirmaGerar()">
-          <i class="ph ph-sparkle"></i> Gerar
-        </button>
-      </div>
+      <button class="btn btn-quat btn-lg" onclick="closeXp()">Cancelar</button>
+      <button class="btn btn-prim btn-lg" onclick="saveXp()">Salvar prompt</button>
     </div>
   </div>
 </div>
@@ -1112,26 +1050,81 @@
    jornada em lugar nenhum. O usuário escolhe apenas o período.
 ════════════════════════════════════════════════════════════ */
 
-/* ── Operações: conjuntos de jornadas relacionadas do mesmo cliente ──
-   Reunião 17/09 (decisão 1): o foco é jornada, mas a análise precisa
-   contemplar a operação. Hoje a maioria dos clientes tem jornada única
-   por operação; Conark e Besni são as exceções com várias. */
-const OPERACOES = [
-  {id:'op1', name:'Cobrança Syscob', journeys:['j1','j2']},
-  {id:'op2', name:'Ativação Besni',  journeys:['j3','j4','j5']},
+/* ── Variáveis de contato disponíveis como destino ── */
+const VARIABLES = [
+  {id:'v1', code:'{{motivo_cancelamento}}',   label:'Motivo de cancelamento'},
+  {id:'v2', code:'{{melhor_data_pagamento}}', label:'Melhor data de pagamento'},
+  {id:'v3', code:'{{canal_preferido}}',       label:'Canal preferido de contato'},
+  {id:'v4', code:'{{concorrente_citado}}',    label:'Concorrente citado'},
 ];
-function opDe(journeyId){ return OPERACOES.find(o=>o.journeys.includes(journeyId)); }
+
+/* ════════════════════════════════════════════════════════════
+   MODO DO PROTÓTIPO
+   ?modo=simplificada → só as análises padrão do sistema
+   ?modo=completa     → padrão + análises criadas pelo usuário
+   Um arquivo só para as duas versões: o que muda é a permissão
+   do usuário criar as próprias análises.
+════════════════════════════════════════════════════════════ */
+const MODO = new URLSearchParams(location.search).get('modo')==='simplificada'
+  ? 'simplificada' : 'completa';
+const FULL = MODO==='completa';
+
+document.title = `Jornada — Vonex.AI · versão ${MODO}`;
+
+/* ── Análises padrão que a IA pode produzir (CCM-3269) ── */
+const BLOCKS = [
+  {key:'summary', name:'Resumo executivo', fixed:true,
+   desc:'Principais achados do período. Sempre incluído.'},
+  {key:'faq',     name:'Perguntas mais frequentes dos contatos',
+   desc:'Agrupadas por tema, com volume, percentual e exemplos reais das conversas.'},
+  {key:'args',    name:'Argumentos utilizados pelos atendentes',
+   desc:'Frequência de uso e eficácia calculada pelo desfecho dos atendimentos.'},
+  {key:'calls',   name:'Validação nas ligações',
+   desc:'Indica se cada pergunta e cada argumento foi confirmado nas ligações, e em quantas.'},
+  {key:'sugg',    name:'Sugestões de melhoria na jornada',
+   desc:'Perguntas frequentes sem resposta automática, com o ponto do fluxo onde inserir.'},
+];
 
 /* ── Jornadas ── */
 const JOURNEYS = [
   {id:'j1', ini:'QJ', name:'3150', status:'Ativo', date:'30/08/2026 às 16:40',
    runs:1, version:'00005', trigger:'Receber mensagem', uid:'6a948712d1fbfd44b99d6711',
    convPerDay:43,
-   ia:{enabled:true, recurring:true, freq:'diario',
-       escopo:'jornada', mails:['lucas.rehem@vonex.com.br'],
+   ia:{enabled:true, recurring:true, freq:'mensal',
+       blocks:{faq:true, args:true, calls:true, sugg:true},
        scenarios:[
          {id:'s1', on:true, name:'Motivo da recusa da proposta',
           desc:'Identificar por que o contato recusou a proposta de acordo: valor da parcela alto, desconfiança na empresa, dívida já paga, ou indisponibilidade financeira no momento.'},
+       ],
+       xps:[
+         {id:'x1', prompt:'Capturar o motivo de cancelamento informado pelo contato', varId:'v1',
+          stats:{analyzed:1284, filled:287},
+          top:[{v:'Preço acima do orçamento', n:96},
+               {v:'Mudança de operadora', n:74},
+               {v:'Insatisfação com o atendimento', n:52},
+               {v:'Mudança de endereço', n:38},
+               {v:'Outros motivos', n:27}],
+          fills:[{who:'Contato 11 98842-1190', val:'Preço acima do orçamento'},
+                 {who:'Contato 11 99120-7745', val:'Mudança de operadora'},
+                 {who:'Contato 21 98811-3320', val:''},
+                 {who:'Contato 31 99118-4402', val:'Insatisfação com o atendimento'},
+                 {who:'Contato 11 97744-8890', val:'Preço acima do orçamento'},
+                 {who:'Contato 41 98230-1177', val:'Mudança de endereço'},
+                 {who:'Contato 11 99002-5513', val:''},
+                 {who:'Contato 21 98455-6621', val:'Mudança de operadora'}]},
+         {id:'x2', prompt:'Identificar a melhor data de pagamento citada espontaneamente pelo contato', varId:'v2',
+          stats:{analyzed:1284, filled:341},
+          top:[{v:'Dia 05', n:78},
+               {v:'Dia 10', n:71},
+               {v:'Dia 15', n:63},
+               {v:'Após o dia 20', n:62},
+               {v:'Outras datas', n:67}],
+          fills:[{who:'Contato 11 98842-1190', val:'Dia 10, após o salário'},
+                 {who:'Contato 31 99770-2214', val:'Dia 05'},
+                 {who:'Contato 11 99120-7745', val:'Dia 15'},
+                 {who:'Contato 21 98811-3320', val:''},
+                 {who:'Contato 11 97744-8890', val:'Dia 25, quando recebo'},
+                 {who:'Contato 41 98230-1177', val:'Dia 05'}]},
        ],
        analyses:[
          {id:'a1', start:'2026-08-01', end:'2026-08-30', at:'30/08/2026 08:12', user:'Lucas Rehem',  type:'recorrente', status:'concluida', hasPrev:true,  qa:[], scenarioIds:['s1']},
@@ -1141,23 +1134,23 @@ const JOURNEYS = [
   {id:'j2', ini:'QJ', name:'2040', status:'Ativo', date:'30/08/2026 às 13:27',
    runs:0, version:'00002', trigger:'Enviar mensagem no WhatsApp', uid:'6a9459eb9727e1273fc168b2',
    convPerDay:28,
-   ia:{enabled:true, recurring:false, freq:'diario',
-       escopo:'jornada', mails:[], scenarios:[],
+   ia:{enabled:true, recurring:false, freq:'mensal', xps:[],
+       blocks:{faq:true, args:true, calls:false, sugg:true}, scenarios:[],
        analyses:[
          {id:'b1', start:'2026-08-10', end:'2026-08-28', at:'28/08/2026 17:44', user:'Camila Alves', type:'manual', status:'falha', hasPrev:false, qa:[]},
        ]}},
 
   {id:'j3', ini:'AA', name:'Jornada Duplicada - Teste de vínculo', status:'Ativo', date:'30/08/2026 às 04:37',
    runs:0, version:'00001', trigger:'Enviar mensagem no WhatsApp', uid:'6a93dd9e9727e1273fc15589',
-   convPerDay:11, ia:{enabled:false, recurring:false, freq:'diario', escopo:'jornada', mails:[], scenarios:[], analyses:[]}},
+   convPerDay:11, ia:{enabled:false, recurring:false, freq:'mensal', xps:[], blocks:{faq:true, args:true, calls:true, sugg:true}, scenarios:[], analyses:[]}},
 
   {id:'j4', ini:'AA', name:'Validação - Jornada Voz', status:'Ativo', date:'30/08/2026 às 04:28',
    runs:1, version:'00001', trigger:'Enviar A.I. Voice', uid:'6a93dba79727e1273fc15585',
-   convPerDay:9, ia:{enabled:false, recurring:false, freq:'diario', escopo:'jornada', mails:[], scenarios:[], analyses:[]}},
+   convPerDay:9, ia:{enabled:false, recurring:false, freq:'mensal', xps:[], blocks:{faq:true, args:true, calls:true, sugg:true}, scenarios:[], analyses:[]}},
 
   {id:'j5', ini:'AA', name:'Vínculo de Jornada - Teste', status:'Ativo', date:'30/08/2026 às 04:24',
    runs:0, version:'00001', trigger:'Enviar mensagem no WhatsApp', uid:'6a93da959727e1273fc15583',
-   convPerDay:6, ia:{enabled:false, recurring:false, freq:'diario', escopo:'jornada', mails:[], scenarios:[], analyses:[]}},
+   convPerDay:6, ia:{enabled:false, recurring:false, freq:'mensal', xps:[], blocks:{faq:true, args:true, calls:true, sugg:true}, scenarios:[], analyses:[]}},
 ];
 
 /* ── Resultado das análises personalizadas (cenários) ── */
@@ -1367,7 +1360,7 @@ function openJourney(id, tab){
   cur = id==='new'
     ? {id:'new', ini:'NJ', name:'', status:'Rascunho', date:today(), runs:0, version:'00001',
        trigger:'Receber mensagem', uid:'—', convPerDay:20,
-       ia:{enabled:false, recurring:false, freq:'diario', escopo:'jornada', mails:[], scenarios:[], analyses:[]}}
+       ia:{enabled:false, recurring:false, freq:'mensal', xps:[], blocks:{faq:true, args:true, calls:true, sugg:true}, scenarios:[], analyses:[]}}
     : JOURNEYS.find(x=>x.id===id);
   curAn = null; busy = false;
   setPeriod(30, true);
@@ -1385,15 +1378,12 @@ function openJourney(id, tab){
   document.getElementById('iaConf').classList.toggle('on', cur.ia.enabled);
   document.getElementById('secIa').classList.toggle('off', !cur.ia.enabled);
   document.getElementById('recurToggle').classList.toggle('on', cur.ia.recurring);
-  document.getElementById('recurOpts').style.display = cur.ia.recurring?'flex':'none';
+  document.getElementById('recurOpts').style.display = cur.ia.recurring?'':'none';
   document.getElementById('recurFreq').value = cur.ia.freq;
-  cur.ia.mailOn = !!cur.ia.mails.length;
-  document.getElementById('mailToggle').classList.toggle('on', cur.ia.mailOn);
-  document.getElementById('mailOpts').style.display = cur.ia.mailOn?'flex':'none';
-  renderScope();
-  renderScenarios();
-  renderMails();
-  renderRecurHint();
+  renderBlocks();
+  applyModo();
+  if(FULL) renderScenarios();
+  renderXps();
   syncIaTab();
 
   jrTab(tab || 'dados');
@@ -1451,68 +1441,44 @@ function toggleRecur(){
   document.getElementById('recurOpts').style.display = cur.ia.recurring?'':'none';
 }
 
+/* Esconde o que é exclusivo da versão completa */
+function applyModo(){
+  const s=document.getElementById('subScenarios');
+  if(s) s.style.display = FULL ? '' : 'none';
+}
+
 /* Faixa de validação: diz qual versão está aberta e permite trocar.
    Não faz parte do produto — é andaime do protótipo. */
 function initModoPill(){
   const el=document.createElement('div');
   el.className='modo-pill';
   el.innerHTML=`
-    <span class="dot full"></span>
-    Ajustada na reunião de 17/09
-    <a href="index.html">ver versões</a>`;
+    <span class="dot ${FULL?'full':''}"></span>
+    Apresentada em 17/09 · ${FULL?'completa':'simplificada'}
+    <a href="index.html">voltar</a>`;
   document.body.appendChild(el);
 }
 
-/* ── Escopo: esta jornada ou a operação inteira ── */
-function renderScope(){
-  const op=opDe(cur.id);
-  const el=document.getElementById('scopeOpts');
-  el.innerHTML = `
-    <button class="opt ${cur.ia.escopo==='jornada'?'on':''}" onclick="setEscopo('jornada')">
-      <span class="radio"></span> <i class="ph ph-tree-structure"></i> Esta jornada
-    </button>
-    ${op?`
-      <button class="opt ${cur.ia.escopo==='operacao'?'on':''}" onclick="setEscopo('operacao')">
-        <span class="radio"></span> <i class="ph ph-stack"></i> Operação ${op.name}
-        <span class="opt-n">${op.journeys.length} jornadas</span>
-      </button>`:''}`;
+/* ── Seleção das análises padrão ── */
+function renderBlocks(){
+  document.getElementById('blockList').innerHTML = BLOCKS.map(b=>{
+    const on = b.fixed || cur.ia.blocks[b.key];
+    return `<div class="an-opt ${on?'on':''} ${b.fixed?'fixed':''}"
+      ${b.fixed?'':`onclick="toggleBlock('${b.key}')"`}>
+      <span class="an-check"><i class="ph ph-check"></i></span>
+      <div class="an-opt-body">
+        <div class="an-opt-ttl">${b.name}</div>
+        <div class="an-opt-sub">${b.desc}</div>
+      </div>
+      ${b.fixed?'<span class="an-lock"><i class="ph ph-lock-simple"></i> Fixo</span>':''}
+    </div>`;
+  }).join('');
 }
-function setEscopo(v){ cur.ia.escopo=v; renderScope(); }
 
-/* ── Recorrência e envio por e-mail ── */
-function renderRecurHint(){
-  const f=document.getElementById('recurFreq');
-  if(!f) return;
-  cur.ia.freq=f.value;
-  const txt={
-    diario:'Roda toda madrugada sobre o dia anterior. É a periodicidade que dá tempo de reagir.',
-    semanal:'Roda uma vez por semana sobre os 7 dias anteriores.',
-    quinzenal:'Roda a cada 15 dias sobre o período anterior.',
-  }[f.value]||'';
-  const el=document.getElementById('recurHint');
-  if(el) el.textContent=txt;
+function toggleBlock(key){
+  cur.ia.blocks[key] = !cur.ia.blocks[key];
+  renderBlocks();
 }
-function toggleMail(){
-  cur.ia.mailOn = !cur.ia.mailOn;
-  document.getElementById('mailToggle').classList.toggle('on', cur.ia.mailOn);
-  document.getElementById('mailOpts').style.display = cur.ia.mailOn?'flex':'none';
-}
-function renderMails(){
-  const el=document.getElementById('mailList');
-  if(!el) return;
-  el.innerHTML = cur.ia.mails.length
-    ? cur.ia.mails.map((m,i)=>`<span class="mail-chip">${m}
-        <i class="ph ph-x" onclick="delMail(${i})"></i></span>`).join('')
-    : '<span style="font-size:12px;color:var(--neutral-color-low-light);font-style:italic">Nenhum destinatário.</span>';
-}
-function addMail(){
-  const inp=document.getElementById('mailInput');
-  const v=(inp.value||'').trim();
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){ toast('err','Informe um e-mail válido.'); return; }
-  if(cur.ia.mails.includes(v)){ toast('warn','Esse e-mail já está na lista.'); return; }
-  cur.ia.mails.push(v); inp.value=''; renderMails();
-}
-function delMail(i){ cur.ia.mails.splice(i,1); renderMails(); }
 
 /* ── Análises personalizadas (cenários) ── */
 function renderScenarios(){
@@ -1584,6 +1550,52 @@ function delScenario(id){
   renderScenarios();
   toast('ok','Análise personalizada removida.');
 }
+
+function renderXps(){
+  const el=document.getElementById('xpList');
+  if(!cur.ia.xps.length){
+    el.innerHTML=`<div style="font-size:12.5px;color:var(--neutral-color-low-light);font-style:italic">
+      Nenhum prompt de extração configurado.</div>`;
+    return;
+  }
+  el.innerHTML = cur.ia.xps.map(x=>{
+    const v=VARIABLES.find(y=>y.id===x.varId);
+    return `<div class="xp">
+      <div class="xp-ico"><i class="ph ph-brackets-curly"></i></div>
+      <div class="xp-body">
+        <div class="xp-prompt">“${x.prompt}”</div>
+        <div class="xp-target">
+          <span class="code">${v?v.code:'—'}</span>
+          <span class="ai-src"><i class="ph ph-sparkle"></i> Preenchido por IA</span>
+        </div>
+      </div>
+      <button class="jact" title="Excluir" onclick="delXp('${x.id}')"><i class="ph ph-trash"></i></button>
+    </div>`;
+  }).join('');
+}
+
+/* ── Prompt de extração: mesmo fluxo em modal da proposta A ── */
+function openXp(){
+  document.getElementById('xpTarget').innerHTML =
+    VARIABLES.map(v=>`<option value="${v.id}">${v.label} · ${v.code}</option>`).join('');
+  document.getElementById('xpPrompt').value='';
+  document.getElementById('xpModal').classList.add('open');
+}
+function closeXp(){ document.getElementById('xpModal').classList.remove('open'); }
+
+function saveXp(){
+  const prompt=document.getElementById('xpPrompt').value.trim();
+  if(!prompt){ toast('err','Informe o prompt de extração.'); return; }
+  cur.ia.xps.push({
+    id:'x'+Date.now(), prompt,
+    varId:document.getElementById('xpTarget').value,
+    stats:{analyzed:0, filled:0}, top:[], fills:[],
+  });
+  closeXp(); renderXps();
+  toast('ok','Prompt de extração salvo. A variável será preenchida na próxima geração de análise.');
+}
+
+function delXp(id){ cur.ia.xps=cur.ia.xps.filter(x=>x.id!==id); renderXps(); }
 
 /* ════════════════════════════════════════════════════════════
    ABA IA PANORÂMICA — escopo = a própria jornada
@@ -1660,7 +1672,7 @@ function renderRail(){
           <div><label>Até</label><input type="date" id="perEnd" value="${per.end}" onchange="customPeriod()"></div>
         </div>`:''}
       <div class="range-msg ${st.cls}">${st.msg}</div>
-      <button class="btn btn-prim" onclick="openGerar()" ${st.ok&&!busy?'':'disabled style="opacity:.5;cursor:default"'}>
+      <button class="btn btn-prim" onclick="generate()" ${st.ok&&!busy?'':'disabled style="opacity:.5;cursor:default"'}>
         <i class="ph ph-sparkle"></i> Gerar análise
       </button>
     </div>
@@ -1833,8 +1845,10 @@ function retry(id){
 function openAnalysis(id){ curAn=id; renderIaPane(); }
 
 /* ── relatório ── */
+/* Selo de validação em ligações — só aparece se o bloco estiver habilitado */
 /* Blocos das análises personalizadas configuradas na jornada */
 function scenarioBlocks(a){
+  if(!FULL) return '';
   const list = cur.ia.scenarios.filter(s=>s.on && s.name);
   if(!list.length) return '';
 
@@ -1886,32 +1900,133 @@ function scenarioBlocks(a){
   }).join('');
 }
 
+function callSeal(n){
+  if(!cur.ia.blocks.calls) return '';
+  return '<span class="sep"></span>' + (n
+    ? `<span class="seal"><i class="ph ph-microphone"></i> Confirmado em ${n} ligações</span>`
+    : '<span class="seal none"><i class="ph ph-microphone-slash"></i> Não confirmado em ligações</span>');
+}
+
 function reportBlock(){
   const a=cur.ia.analyses.find(x=>x.id===curAn);
   if(!a) return '';
-  const r=REPORT, cov=r.coverage;
+  const r=REPORT;
+  const eff=v=>v>=60?'ok':(v>=45?'warn':'err');
+  /* atendimentos automáticos = conversas que a jornada resolveu sem transbordo */
+  const auto    = r.coverage.conversations - r.coverage.humanTotal;
+  const autoPct = Math.round(auto / r.coverage.conversations * 100);
 
   return `
   <div class="rep-hero">
     <div class="rep-hero-in">
-      <div class="rep-hero-top"><i class="ph ph-sparkle"></i><h5>Resumo executivo</h5></div>
+      <div class="rep-hero-top"><i class="ph ph-sparkle"></i><h5>Resumo executivo</h5>
+        <span style="flex:1"></span>
+        <span style="font-size:11.5px;color:var(--neutral-color-low-light)">${fmt(a.start)} – ${fmt(a.end)} · gerada em ${a.at}</span></div>
       <p>${r.summary}</p>
-      <!-- Rastreabilidade do que a IA leu — não é relatório de negócio -->
-      <div class="rep-base">
-        <i class="ph ph-database"></i>
-        ${cov.conversations.toLocaleString('pt-BR')} conversas ·
-        ${cov.humanTotal} atendimentos humanos (${cov.humanText} mensagem, ${cov.humanVoice} voz) ·
-        ${cov.calls} ligações por transcrição
-        <span class="rep-base-skip">${cov.callsSkipped} sem transcrição, desconsideradas</span>
+    </div>
+  </div>
+
+  <div class="sec"><div class="sec-hdr" style="padding:18px 20px">
+    <div class="sec-ttl"><h4 style="font-size:16px">Cobertura da análise</h4>
+      <p>Fluxo da jornada · relatórios · conversas · atendimentos humanos por mensagem e por voz</p></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-quat btn-sm" onclick="exportRep()"><i class="ph ph-download-simple"></i> Exportar</button>
+    </div></div>
+    <div class="sec-body">
+      <div class="cov">
+        <div class="cov-i"><div class="cov-l"><i class="ph ph-chats-circle"></i> Conversas</div>
+          <div class="cov-v">${r.coverage.conversations.toLocaleString('pt-BR')}</div></div>
+        <div class="cov-i"><div class="cov-l"><i class="ph ph-robot"></i> Atendimentos automáticos</div>
+          <div class="cov-v">${auto.toLocaleString('pt-BR')}</div>
+          <div class="cov-h">${autoPct}% resolvidos sem transbordo</div></div>
+        <div class="cov-i"><div class="cov-l"><i class="ph ph-headset"></i> Atendimentos humanos</div>
+          <div class="cov-v">${r.coverage.humanTotal}</div>
+          <div class="cov-h">${r.coverage.humanText} mensagem · ${r.coverage.humanVoice} voz</div></div>
+        <div class="cov-i"><div class="cov-l"><i class="ph ph-microphone"></i> Ligações analisadas</div>
+          <div class="cov-v">${r.coverage.calls}</div>
+          <div class="cov-h">Via transcrição · ${r.coverage.callsSkipped} sem transcrição, desconsideradas</div></div>
       </div>
     </div>
   </div>
 
-  <!-- Reunião 17/09 — decisão 5: única análise fixa que permaneceu -->
+  ${a.hasPrev?`
+  <div class="sec"><div class="sec-hdr" style="padding:18px 20px">
+    <div class="sec-ttl"><h4 style="font-size:16px">Comparativo com a execução anterior</h4>
+      <p>Evolução das perguntas e dos argumentos</p></div></div>
+    <div class="sec-body"><div class="cov" style="grid-template-columns:repeat(3,1fr)">
+      ${r.comparison.map(c=>`
+        <div class="cov-i"><div class="cov-l">${c.label}</div>
+          <div class="cov-v">${c.cur}
+            <span class="ia-delta" style="font-size:12px;margin-left:6px;color:${c.dir==='up'?'var(--feedback-color-success-dark)':'var(--feedback-color-warning-dark)'}">
+              <i class="ph ${c.dir==='up'?'ph-trend-up':'ph-trend-down'}"></i> ${c.note}</span></div>
+          <div class="cov-h">Anterior: ${c.prev}</div></div>`).join('')}
+    </div></div>
+  </div>`:''}
+
+  ${cur.ia.blocks.faq?`
+  <div class="sec"><div class="sec-hdr" style="padding:18px 20px">
+    <div class="sec-ttl"><h4 style="font-size:16px">Perguntas mais frequentes dos contatos</h4>
+      <p>Agrupadas por tema, com volume, percentual e exemplos reais</p></div></div>
+    <div class="sec-body" style="gap:10px">
+      ${r.themes.map((t,i)=>`
+        <div class="row" id="T${i}">
+          <div class="row-hdr" onclick="rowT('T${i}')">
+            <div class="row-main">
+              <div class="row-ttl">${t.name}
+                ${t.gap?'<span class="seal gap"><i class="ph ph-warning"></i> Sem resposta no fluxo</span>':''}</div>
+              <div class="row-meta"><span>${t.volume} menções</span>${callSeal(t.calls)}</div>
+              <div class="bar"><span style="width:${t.pct}%"></span></div>
+            </div>
+            <div class="row-val">${t.pct}%</div>
+            <button class="det-btn" title="Ver detalhamento"
+              onclick="event.stopPropagation();openDet('theme','${t.name.replace(/'/g,"\\'")}')">
+              <i class="ph ph-arrows-out-simple"></i></button>
+            <i class="ph ph-caret-down row-caret"></i>
+          </div>
+          <div class="row-body">
+            <div class="lbl">Exemplos reais</div>
+            ${t.examples.map(x=>`<div class="quote">“${x.txt}”<span class="src-l">${x.src}</span></div>`).join('')}
+          </div>
+        </div>`).join('')}
+    </div>
+  </div>`:''}
+
+  ${cur.ia.blocks.args?`
+  <div class="sec"><div class="sec-hdr" style="padding:18px 20px">
+    <div class="sec-ttl"><h4 style="font-size:16px">Argumentos utilizados pelos atendentes</h4>
+      <p>Eficácia calculada pelo desfecho dos atendimentos em que o argumento foi utilizado</p></div></div>
+    <div class="sec-body" style="gap:10px">
+      ${r.args.map((g,i)=>`
+        <div class="row" id="A${i}">
+          <div class="row-hdr" onclick="rowT('A${i}')">
+            <div class="row-main">
+              <div class="row-ttl">${g.name}</div>
+              <div class="row-meta"><span>${g.uses} usos</span>${callSeal(g.calls)}</div>
+              <div class="bar ${eff(g.eff)}"><span style="width:${g.eff}%"></span></div>
+            </div>
+            <div class="row-val">${g.eff}%</div>
+            <button class="det-btn" title="Ver detalhamento"
+              onclick="event.stopPropagation();openDet('arg','${g.name.replace(/'/g,"\\'")}')">
+              <i class="ph ph-arrows-out-simple"></i></button>
+            <i class="ph ph-caret-down row-caret"></i>
+          </div>
+          <div class="row-body">
+            <div class="lbl">Desfechos dos atendimentos</div>
+            <div class="outs">
+              <div class="out"><div class="out-l">Acordo fechado</div><div class="out-v">${g.outcomes.deal}</div></div>
+              <div class="out"><div class="out-l">Retorno agendado</div><div class="out-v">${g.outcomes.callback}</div></div>
+              <div class="out"><div class="out-l">Recusa</div><div class="out-v">${g.outcomes.refusal}</div></div>
+            </div>
+            <div class="quote" style="font-style:normal">${g.note}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+  </div>`:''}
+
+  ${cur.ia.blocks.sugg?`
   <div class="sec"><div class="sec-hdr" style="padding:18px 20px">
     <div class="sec-ttl"><h4 style="font-size:16px">Sugestões de melhoria na jornada</h4>
-      <p>A IA comparou o objetivo do agente com o que está acontecendo nas conversas</p></div>
-    <span class="ia-auto"><i class="ph ph-lock-simple"></i> Automática</span></div>
+      <p>Perguntas frequentes sem resposta automática no fluxo</p></div></div>
     <div class="sec-body" style="gap:10px">
       ${r.suggestions.map(s=>`
         <div class="sugg">
@@ -1919,6 +2034,7 @@ function reportBlock(){
           <div style="flex:1;min-width:0">
             <div class="sugg-t">${s.title}</div>
             <div class="sugg-d">${s.desc}</div>
+            <!-- a sugestão aponta para o nó do fluxo, na aba ao lado -->
             <div class="node go" onclick="jrTab('dados')"><i class="ph ph-flow-arrow"></i> ${s.node}
               <i class="ph ph-arrow-up-right" style="font-size:11px"></i></div>
           </div>
@@ -1927,123 +2043,67 @@ function reportBlock(){
             <i class="ph ph-arrows-out-simple"></i></button>
         </div>`).join('')}
     </div>
-  </div>
+  </div>`:''}
 
   ${scenarioBlocks(a)}
 
-  <!-- Reunião 17/09 — decisão 7: o chat permanece -->
+  ${cur.ia.xps.length?`
   <div class="sec"><div class="sec-hdr" style="padding:18px 20px">
-    <div class="sec-ttl"><h4 style="font-size:16px">Perguntar sobre esta análise</h4>
-      <p>As respostas consideram esta jornada no período de ${fmt(a.start)} a ${fmt(a.end)}</p></div></div>
-    <div class="sec-body">
-      <div class="chat" id="chat">${renderQa(a)}</div>
-      <div class="chips">
-        <span class="chip" onclick="chipAsk(this)">Por que os contatos abandonam a conversa?</span>
-        <span class="chip" onclick="chipAsk(this)">O que mais aparece nas sugestões?</span>
-        <span class="chip" onclick="chipAsk(this)">Qual o horário com mais recusa?</span>
-      </div>
-      <div class="ask">
-        <textarea id="askInput" placeholder="Pergunte algo sobre os dados desta análise…"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ask();}"></textarea>
-        <button class="btn btn-prim" onclick="ask()"><i class="ph ph-paper-plane-tilt"></i> Enviar</button>
-      </div>
-      <div class="field-hint">Perguntas e respostas ficam salvas junto a esta análise.</div>
+    <div class="sec-ttl"><h4 style="font-size:16px">Informações coletadas em variáveis</h4>
+      <p>Extraídas durante esta geração, a partir dos prompts fixos da jornada</p></div></div>
+    <div class="sec-body" style="gap:10px">
+      ${cur.ia.xps.map((x,xi)=>{
+        const v=VARIABLES.find(y=>y.id===x.varId);
+        const st=x.stats||{analyzed:0,filled:0};
+        const pct=st.analyzed?Math.round(st.filled/st.analyzed*100):0;
+        return `<div class="row" id="X${xi}">
+          <div class="row-hdr" onclick="rowT('X${xi}')">
+            <div class="row-main">
+              <div class="row-ttl">“${x.prompt}”</div>
+              <div class="row-meta">
+                <span class="code">${v?v.code:'—'}</span><span class="sep"></span>
+                <span>${st.filled.toLocaleString('pt-BR')} de ${st.analyzed.toLocaleString('pt-BR')} conversas preencheram</span>
+              </div>
+              <div class="bar"><span style="width:${pct}%"></span></div>
+            </div>
+            <div class="row-val">${pct}%</div>
+            <button class="det-btn" title="Ver detalhamento"
+              onclick="event.stopPropagation();openDet('var','${x.id}')">
+              <i class="ph ph-arrows-out-simple"></i></button>
+            <i class="ph ph-caret-down row-caret"></i>
+          </div>
+          <div class="row-body">
+            ${(x.top&&x.top.length)?`
+              <div class="lbl">Valores mais frequentes</div>
+              ${x.top.slice(0,3).map(t=>`
+                <div class="det-line">
+                  <div class="det-line-m">
+                    <div class="det-line-t">${t.v}</div>
+                    <div class="bar"><span style="width:${Math.round(t.n/st.filled*100)}%"></span></div>
+                  </div>
+                  <div class="det-line-v">${t.n}</div>
+                </div>`).join('')}`:''}
+            <div class="lbl">Amostra de contatos</div>
+            ${x.fills.slice(0,3).map(f=>`
+              <div style="display:flex;align-items:center;gap:10px;font-size:12.5px;background:var(--background-color-light);border-radius:var(--r-sm);padding:7px 10px;margin-top:6px">
+                <span style="color:var(--neutral-color-low-medium);min-width:150px">${f.who}</span>
+                ${f.val?`<span style="flex:1;font-weight:500">${f.val}</span><span class="ai-src"><i class="ph ph-sparkle"></i> Preenchido por IA</span>`
+                       :`<span style="flex:1;color:var(--neutral-color-low-light);font-style:italic">Não encontrado na conversa — variável permanece vazia</span>`}
+              </div>`).join('')}
+            ${x.fills.length>3?`<div style="font-size:11.5px;color:var(--neutral-color-low-light);margin-top:9px">
+              Mostrando 3 de ${x.fills.length} da amostra — abra o detalhamento para ver a lista completa.</div>`:''}
+          </div>
+        </div>`;
+      }).join('')}
     </div>
+  </div>`:''}
+
+  <div class="info-banner">
+    <i class="ph ph-sparkle"></i>
+    <span>Os argumentos de maior eficácia desta análise ficam disponíveis como sugestão para a personalização do prompt do assistente de IA do operador no Chat.</span>
   </div>
+
   `;
-}
-
-/* ── Modal de geração: desmarcar o que não quer gerar ──
-   Reunião 17/09 — decisão 11 */
-let gerarSel = {};
-function openGerar(){
-  const st=rangeState();
-  if(!st.ok){ toast('warn','Ajuste o período antes de gerar.'); return; }
-  gerarSel = {sugestoes:true};
-  cur.ia.scenarios.filter(s=>s.on && s.name).forEach(s=>gerarSel[s.id]=true);
-  renderGerar();
-  document.getElementById('gerarModal').classList.add('open');
-}
-function closeGerar(){ document.getElementById('gerarModal').classList.remove('open'); }
-function toggleGerar(k){ gerarSel[k]=!gerarSel[k]; renderGerar(); }
-
-function renderGerar(){
-  const st=rangeState();
-  const op=opDe(cur.id);
-  const escopo = cur.ia.escopo==='operacao' && op
-    ? `Operação ${op.name} · ${op.journeys.length} jornadas`
-    : cur.name;
-  const custom = cur.ia.scenarios.filter(s=>s.on && s.name);
-  const n = Object.values(gerarSel).filter(Boolean).length;
-
-  document.getElementById('gerarScope').innerHTML =
-    `<i class="ph ${cur.ia.escopo==='operacao'?'ph-stack':'ph-tree-structure'}"></i> ${escopo}
-     <span class="sep"></span> ${fmt(per.start)} – ${fmt(per.end)} (${st.d} dias)`;
-
-  document.getElementById('gerarList').innerHTML = `
-    <div class="an-opt ${gerarSel.sugestoes?'on':''}" onclick="toggleGerar('sugestoes')">
-      <span class="an-check"><i class="ph ph-check"></i></span>
-      <div class="an-opt-body">
-        <div class="an-opt-ttl">Sugestões de melhoria</div>
-        <div class="an-opt-sub">Análise automática — a IA lê o objetivo do agente e propõe melhorias.</div>
-      </div>
-    </div>
-    ${custom.map(s=>`
-      <div class="an-opt ${gerarSel[s.id]?'on':''}" onclick="toggleGerar('${s.id}')">
-        <span class="an-check"><i class="ph ph-check"></i></span>
-        <div class="an-opt-body">
-          <div class="an-opt-ttl">${s.name}</div>
-          <div class="an-opt-sub">${s.desc||'Sem descrição.'}</div>
-        </div>
-      </div>`).join('')}`;
-
-  const btn=document.getElementById('gerarBtn');
-  btn.disabled = n===0;
-  btn.style.opacity = n?1:.5;
-  btn.style.cursor = n?'pointer':'default';
-  document.getElementById('gerarCount').textContent =
-    n ? `${n} ${n===1?'análise selecionada':'análises selecionadas'}` : 'Selecione ao menos uma análise.';
-}
-
-function confirmaGerar(){
-  if(document.getElementById('gerarBtn').disabled) return;
-  closeGerar();
-  generate();
-}
-
-/* ── Exemplo do que é gerado — decisão 13 ── */
-function openExemplo(){
-  const r=REPORT;
-  document.getElementById('detKind').innerHTML='<i class="ph ph-eye"></i> Exemplo';
-  document.getElementById('detTitle').textContent='O que a IA entrega';
-  document.getElementById('detScope').textContent='Exemplo ilustrativo · dados fictícios';
-  document.getElementById('detBody').innerHTML = `
-    <div class="rep-hero"><div class="rep-hero-in">
-      <div class="rep-hero-top"><i class="ph ph-sparkle"></i><h5>Resumo executivo</h5></div>
-      <p>${r.summary}</p>
-    </div></div>
-    ${detSection('Sugestões de melhoria', r.suggestions.slice(0,2).map(s=>`
-      <div class="sugg" style="margin-bottom:8px">
-        <div class="sugg-ico"><i class="ph ph-lightbulb"></i></div>
-        <div><div class="sugg-t">${s.title}</div>
-          <div class="sugg-d">${s.desc}</div>
-          <div class="node"><i class="ph ph-flow-arrow"></i> ${s.node}</div></div>
-      </div>`).join(''))}
-    <div class="modal-alert info"><i class="ph ph-info"></i>
-      <span>As análises que você criar aparecem como blocos próprios, no mesmo formato.</span></div>`;
-  document.getElementById('detModal').classList.add('open');
-}
-
-/* ── Chat: transformar a pergunta sem resposta em análise ── */
-function incluirNaProxima(el, pergunta){
-  cur.ia.scenarios.push({
-    id:'s'+Date.now(), on:true, open:false,
-    name: pergunta.length>48 ? pergunta.slice(0,48)+'…' : pergunta,
-    desc: pergunta,
-  });
-  renderScenarios();
-  el.outerHTML = '<span class="chip" style="border-color:var(--feedback-color-success-pure);color:var(--feedback-color-success-dark)"><i class="ph ph-check"></i> Incluída nas análises da jornada</span>';
-  toast('ok','Análise criada. Entra no próximo processamento desta jornada.');
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -2054,7 +2114,7 @@ function closeDet(){ document.getElementById('detModal').classList.remove('open'
 function openDet(kind, key){
   const a = cur.ia.analyses.find(x=>x.id===curAn); if(!a) return;
   const r = REPORT;
-  const built = {sugg:detSugg, scn:detScn}[kind](key, r, a);
+  const built = {theme:detTheme, arg:detArg, sugg:detSugg, scn:detScn, var:detVar}[kind](key, r, a);
   if(!built) return;
 
   document.getElementById('detKind').innerHTML  = `<i class="ph ${built.icon}"></i> ${built.kind}`;
@@ -2085,6 +2145,68 @@ function detLines(rows, total){
 }
 function detQuotes(list){
   return list.map(x=>`<div class="quote">“${x.txt||x.q}”${x.src?`<span class="src-l">${x.src}</span>`:''}</div>`).join('');
+}
+
+/* ── Tema de pergunta frequente ── */
+function detTheme(name, r, a){
+  const t = r.themes.find(x=>x.name===name); if(!t) return null;
+  /* derivados do próprio recorte, para não divergir dos números do card */
+  const voice = Math.round(t.volume * r.coverage.humanVoice / r.coverage.humanTotal);
+  const text  = t.volume - voice;
+  const esc   = t.gap ? t.volume : Math.round(t.volume * 0.34);
+  const solved= t.volume - esc;
+  const uniq  = Math.round(t.volume * 0.86);
+
+  return {
+    kind:'Pergunta frequente', icon:'ph-question', title:t.name,
+    body:
+      detMetrics([
+        {l:'Menções no período', v:t.volume, h:`${t.pct}% do total`},
+        {l:'Contatos distintos', v:uniq},
+        {l:'Confirmado em ligações', v:t.calls || '—', h:t.calls?'via transcrição':'não confirmado'},
+        {l:'Resolvido pelo fluxo', v:`${Math.round(solved/t.volume*100)}%`, h:`${esc} transbordaram`},
+      ])
+      + (t.gap ? `<div class="modal-alert warn"><i class="ph ph-warning"></i>
+          <span>Este tema não tem resposta automática no fluxo — todos os ${t.volume} contatos foram
+          transbordados para atendimento humano.</span></div>` : '')
+      + detSection('Como o contato pergunta', detLines((t.variants||[]).map(v=>({t:v.q, n:v.n})), t.volume))
+      + detSection('Onde apareceu', `<div class="det-split">
+          <div class="det-half"><div class="det-line"><div class="det-line-m">
+            <div class="det-line-t">Por mensagem</div>
+            <div class="bar"><span style="width:${Math.round(text/t.volume*100)}%"></span></div>
+          </div><div class="det-line-v">${text}</div></div></div>
+          <div class="det-half"><div class="det-line"><div class="det-line-m">
+            <div class="det-line-t">Por voz</div>
+            <div class="bar sec"><span style="width:${Math.round(voice/t.volume*100)}%"></span></div>
+          </div><div class="det-line-v">${voice}</div></div></div>
+        </div>`)
+      + detSection('Exemplos reais', detQuotes(t.examples)),
+  };
+}
+
+/* ── Argumento de atendente ── */
+function detArg(name, r, a){
+  const g = r.args.find(x=>x.name===name); if(!g) return null;
+  const tot = g.outcomes.deal + g.outcomes.callback + g.outcomes.refusal;
+  return {
+    kind:'Argumento do atendente', icon:'ph-chat-teardrop-text', title:g.name,
+    body:
+      detMetrics([
+        {l:'Usos no período', v:g.uses},
+        {l:'Eficácia', v:`${g.eff}%`, h:'acordos sobre usos'},
+        {l:'Confirmado em ligações', v:g.calls || '—', h:g.calls?'via transcrição':'não confirmado'},
+        {l:'Posição no ranking', v:`${r.args.indexOf(g)+1}º`, h:`de ${r.args.length}`},
+      ])
+      + detSection('Desfecho dos atendimentos', detLines([
+          {t:'Acordo fechado',   n:g.outcomes.deal},
+          {t:'Retorno agendado', n:g.outcomes.callback},
+          {t:'Recusa',           n:g.outcomes.refusal},
+        ], tot))
+      + detSection('Temas em que aparece',
+          `<div class="det-tags">${(g.inThemes||[]).map(x=>`<span class="det-tag">${x}</span>`).join('')}</div>`)
+      + detSection('Trechos reais', detQuotes(g.snippets||[]))
+      + `<div class="modal-alert info"><i class="ph ph-sparkle"></i><span>${g.note}</span></div>`,
+  };
 }
 
 /* ── Sugestão de melhoria ── */
@@ -2131,13 +2253,53 @@ function detScn(key, r, a){
   };
 }
 
+/* ── Variável coletada por prompt fixo ── */
+function detVar(id, r, a){
+  const x = cur.ia.xps.find(y=>y.id===id); if(!x) return null;
+  const v  = VARIABLES.find(y=>y.id===x.varId);
+  const st = x.stats||{analyzed:0, filled:0};
+  const empty = st.analyzed - st.filled;
+  const pct = st.analyzed?Math.round(st.filled/st.analyzed*100):0;
+
+  return {
+    kind:'Coleta em variável', icon:'ph-brackets-curly', title:v?v.label:'Variável',
+    body:
+      detMetrics([
+        {l:'Conversas analisadas', v:st.analyzed.toLocaleString('pt-BR')},
+        {l:'Variável preenchida', v:st.filled.toLocaleString('pt-BR'), h:`${pct}% das conversas`},
+        {l:'Permaneceu vazia', v:empty.toLocaleString('pt-BR'), h:'informação não mencionada'},
+        {l:'Variável de destino', v:v?v.code:'—'},
+      ])
+      + detSection('Prompt fixo configurado na jornada',
+          `<div class="quote" style="font-style:normal">“${x.prompt}”</div>`)
+      + ((x.top&&x.top.length)
+          ? detSection('Valores mais frequentes', detLines(x.top.map(t=>({t:t.v, n:t.n})), st.filled))
+          : '')
+      + detSection(`Amostra de contatos (${x.fills.length})`,
+          x.fills.map(f=>`
+            <div class="det-line">
+              <div class="det-line-m">
+                <div class="det-line-t">${f.who}</div>
+              </div>
+              <div style="flex:1;min-width:0;font-size:13px;text-align:right">
+                ${f.val
+                  ? `<span style="font-weight:500">${f.val}</span>
+                     <span class="ai-src" style="margin-left:8px"><i class="ph ph-sparkle"></i> Preenchido por IA</span>`
+                  : `<span style="color:var(--neutral-color-low-light);font-style:italic">Não encontrado — permanece vazia</span>`}
+              </div>
+            </div>`).join(''))
+      + `<div class="modal-alert info"><i class="ph ph-info"></i>
+          <span>Nenhum valor é inferido: quando a informação não aparece na conversa, a variável permanece vazia.
+          Valores preenchidos ficam disponíveis em jornadas, campanhas e chat, sempre com a origem “Preenchido por IA”.</span></div>`,
+  };
+}
+
 document.querySelectorAll('.modal-bg').forEach(m=>{
   m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('open'); });
 });
 
 function rowT(id){ const el=document.getElementById(id); if(el) el.classList.toggle('open'); }
-/* Reunião 17/09 — decisão 10: PDF e planilha */
-function exportRep(fmt){ toast('ok', fmt==='xlsx'?'Planilha exportada.':'PDF exportado.'); }
+function exportRep(){ toast('ok','Relatório exportado.'); }
 
 /* ── campo de prompt ──────────────────────────────────────────
    INATIVO: a seção "Perguntar sobre esta análise" foi removida da UI
@@ -2154,11 +2316,7 @@ function renderQa(a){
   return a.qa.map(m=>`
     <div class="msg ${m.role==='me'?'me':''}">
       <div class="msg-av">${m.role==='me'?'SS':'<i class="ph ph-sparkle"></i>'}</div>
-      <div><div class="bub">${m.text}</div>
-        ${m.add?`<div class="chips" style="margin-top:8px">
-          <span class="chip" onclick="incluirNaProxima(this,'${m.add.replace(/'/g,"\\'")}')">
-            <i class="ph ph-plus-circle"></i> Incluir a partir do próximo processamento</span></div>`:''}
-        <div class="msg-t" style="${m.role==='me'?'text-align:right':''}">${m.time}</div></div>
+      <div><div class="bub">${m.text}</div><div class="msg-t" style="${m.role==='me'?'text-align:right':''}">${m.time}</div></div>
     </div>`).join('');
 }
 
@@ -2174,39 +2332,44 @@ function ask(){
   chat.innerHTML = renderQa(a) + `<div class="msg"><div class="msg-av"><i class="ph ph-sparkle"></i></div>
     <div class="bub"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
   setTimeout(()=>{
-    const r=answer(q,a);
-    a.qa.push({role:'ia', text:r.html, time:hhmm(), add:r.add||null});
+    a.qa.push({role:'ia', text:answer(q,a), time:hhmm()});
     const c=document.getElementById('chat');
     if(c) c.innerHTML = renderQa(a);
   },1100);
 }
 
 /* Respostas restritas ao recorte: esta jornada + este período */
-/* Reunião 17/09 — decisão 7: se o dado não existe na análise, a IA diz
-   que não tem e oferece incluir a partir do próximo processamento. */
 function answer(q,a){
   const s=q.toLowerCase(), r=REPORT;
 
-  if(/outra jornada|todas as jornadas|renova[çc]|onboarding|m[êe]s passado|outro per[íi]odo/.test(s)){
-    return {html:`Não tenho dados desse recorte. Esta análise cobre <strong>${cur.name}</strong> entre ${fmt(a.start)} e ${fmt(a.end)}.`};
+  const otherJourney = JOURNEYS.some(j=>j.id!==cur.id && s.includes(j.name.toLowerCase().slice(0,8)))
+    || /outra jornada|todas as jornadas|renova[çc]|onboarding|compare com a jornada|m[êe]s passado|outro per[íi]odo/.test(s);
+  if(otherJourney){
+    return `Não há dados disponíveis para esse recorte. Esta análise contempla somente a jornada <strong>${cur.name}</strong> entre ${fmt(a.start)} e ${fmt(a.end)}. Para outra jornada, abra a aba IA Panorâmica dela.`;
   }
-  if(/melhor|sugest|fluxo|otimiz|abandon|desist/.test(s)){
-    return {html:`A sugestão de maior impacto é <strong>${r.suggestions[0].title.toLowerCase()}</strong>. ${r.suggestions[0].desc} Ponto indicado: <strong>${r.suggestions[0].node}</strong>.`};
+  if(/argumento|efic|fecha mais|acordo/.test(s)){
+    const t=r.args[0];
+    return `O argumento de maior eficácia é <strong>“${t.name}”</strong>, com ${t.eff}% de acordos em ${t.uses} usos (${t.outcomes.deal} acordos, ${t.outcomes.callback} retornos agendados, ${t.outcomes.refusal} recusas). Confirmado em ${t.calls} ligações.
+      <ul><li>${r.args[1].name} — ${r.args[1].eff}%</li><li>${r.args[2].name} — ${r.args[2].eff}%</li></ul>`;
   }
-  const scn = cur.ia.scenarios.find(x=>x.on && x.name &&
-    s.includes(x.name.toLowerCase().split(' ')[0]));
-  if(scn){
-    const res=SCENARIO_RESULTS[scn.id]||genericScenario(scn);
-    return {html:`Na análise <strong>${scn.name}</strong>: ${res.intro}
-      <ul>${res.findings.slice(0,3).map(f=>`<li>${f.label} — ${f.n} (${f.pct}%)</li>`).join('')}</ul>`};
+  if(/negativ|serasa|restri/.test(s)){
+    const t=r.themes.find(x=>/negativ/i.test(x.name));
+    return `Negativação e Serasa aparecem em <strong>${t.volume} menções (${t.pct}%)</strong>, confirmadas em ${t.calls} ligações. O tema <strong>não tem resposta automática no fluxo desta jornada</strong> — todos os contatos foram transbordados para atendimento humano.`;
   }
-
-  /* fora do que foi processado */
-  return {
-    html:`Esse dado não está nesta análise — ele não foi extraído no processamento.
-      Quer que eu passe a incluir isso a partir do próximo?`,
-    add:q,
-  };
+  if(/ligaç|voz|transcri|áudio|audio/.test(s)){
+    return `Foram analisadas <strong>${r.coverage.calls} ligações</strong> pela transcrição automática já disponível nos relatórios. Outras <strong>${r.coverage.callsSkipped}</strong> não tinham transcrição e foram desconsideradas.`;
+  }
+  if(/pergunt|dúvida|duvida|tema|frequen/.test(s)){
+    return `Os temas mais frequentes:<ul>${r.themes.slice(0,4).map(t=>`<li>${t.name} — ${t.volume} menções (${t.pct}%)</li>`).join('')}</ul>Negativação e parcelamento no cartão não têm resposta automática no fluxo.`;
+  }
+  if(/melhor|sugest|fluxo|otimiz/.test(s)){
+    return `A recomendação de maior impacto: <strong>${r.suggestions[0].title.toLowerCase()}</strong>. ${r.suggestions[0].desc} Ponto indicado no fluxo: <strong>${r.suggestions[0].node}</strong>.`;
+  }
+  if(/vari|extra|coleta/.test(s)){
+    if(!cur.ia.xps.length) return 'Esta jornada não tem prompts fixos de extração configurados. Você pode adicioná-los na aba Dados da jornada, no cartão da IA Panorâmica.';
+    return `Esta jornada tem ${cur.ia.xps.length} prompt(s) de extração. Os valores encontrados aparecem no bloco “Informações coletadas em variáveis”, sempre com a origem “Preenchido por IA”.`;
+  }
+  return `Nesta análise de <strong>${cur.name}</strong> (${fmt(a.start)} – ${fmt(a.end)}), o tema dominante é <strong>${r.themes[0].name.toLowerCase()}</strong> (${r.themes[0].pct}%) e o argumento mais eficaz é <strong>“${r.args[0].name}”</strong> (${r.args[0].eff}%).`;
 }
 
 /* ════════════════════════════════════════════════════════════
