@@ -461,6 +461,57 @@
   border-radius:var(--r-pill);padding:1px 7px;font-size:10.5px;letter-spacing:0;
 }
 
+/* ── Painéis laterais recolhíveis: análises | relatório | chat ── */
+.ia-rail, .ia-chat-dock{transition:width .22s cubic-bezier(.32,.72,0,1);}
+
+.ia-chat-dock{
+  width:380px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;
+  border-left:1px solid var(--neutral-color-high-medium);
+  background:var(--background-color-lightest);
+}
+.ia-chat-hdr{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:16px 14px 13px 18px;border-bottom:1px solid var(--neutral-color-high-light);flex-shrink:0;
+}
+.ia-chat-hdr-t{flex:1;min-width:0;}
+.ia-chat-hdr h4{font-size:14px;font-weight:600;color:var(--neutral-color-low-pure);
+  display:flex;align-items:center;gap:8px;}
+.ia-chat-hdr h4 i{font-size:17px;color:var(--brand-color-primary-pure);}
+.ia-chat-hdr p{font-size:11.5px;color:var(--neutral-color-low-light);margin-top:5px;line-height:1.5;}
+.ia-chat-body{flex:1;overflow-y:auto;padding:16px 18px;}
+.ia-chat-foot{
+  border-top:1px solid var(--neutral-color-high-light);padding:12px 18px 14px;flex-shrink:0;
+  display:flex;flex-direction:column;gap:9px;
+}
+.ia-chat-dock .msg{max-width:100%;}
+.ia-chat-dock .chips{max-height:92px;overflow-y:auto;}
+.ia-chat-dock .ask .btn{padding:0 12px;}
+
+/* botão de recolher */
+.dock-btn{
+  width:28px;height:28px;border-radius:var(--r-sm);border:none;background:none;flex-shrink:0;
+  color:var(--neutral-color-low-light);font-size:15px;
+  display:inline-flex;align-items:center;justify-content:center;transition:background .12s,color .12s;
+}
+.dock-btn:hover{background:var(--neutral-color-high-light);color:var(--neutral-color-low-pure);}
+
+/* estado recolhido: vira uma faixa vertical clicável */
+.ia-rail.collapsed, .ia-chat-dock.collapsed{width:46px;}
+.dock-strip{
+  flex:1;width:100%;border:none;background:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  padding:16px 0;color:var(--neutral-color-low-medium);transition:background .12s,color .12s;
+}
+.dock-strip:hover{background:var(--neutral-color-high-light);color:var(--brand-color-primary-pure);}
+.dock-strip > i{font-size:17px;}
+.dock-strip-lbl{
+  writing-mode:vertical-rl;font-size:11.5px;font-weight:500;letter-spacing:.02em;white-space:nowrap;
+}
+.dock-strip-n{
+  background:var(--neutral-color-high-light);color:var(--neutral-color-low-medium);
+  border-radius:var(--r-pill);padding:1px 6px;font-size:10px;font-weight:600;
+}
+
 /* ── Ajustes da reunião de 17/09 ── */
 .ia-auto{
   display:inline-flex;align-items:center;gap:5px;
@@ -1039,6 +1090,8 @@
           <div class="ia-cols">
             <aside class="ia-rail" id="iaRail"></aside>
             <div class="ia-report-col" id="iaReportCol"></div>
+            <!-- ANGULAR: <app-journey-panoramic-ask> — chat fixo, recolhível -->
+            <aside class="ia-chat-dock" id="iaChatDock"></aside>
           </div>
         </div>
 
@@ -1614,10 +1667,16 @@ function rangeState(){
 function renderIaPane(){
   renderRail();
   renderReportCol();
+  renderChatDock();
 }
 
 /* ── rail esquerdo: todas as análises da jornada ── */
 let railFilter = {status:'', type:'', q:''};
+
+/* Painéis laterais recolhíveis — o relatório é o que ganha espaço */
+let railOpen = true, chatOpen = true;
+function toggleRail(){ railOpen=!railOpen; renderRail(); }
+function toggleChat(){ chatOpen=!chatOpen; renderChatDock(); }
 let customOpen = false;
 function toggleCustom(){ customOpen = !customOpen; renderRail(); }
 function setRailFilter(k,v){ railFilter[k]=v; renderRail(); }
@@ -1644,7 +1703,19 @@ function renderRail(){
   const st=rangeState();
   const showDates = customOpen || per.preset===null;
 
-  document.getElementById('iaRail').innerHTML = `
+  const rail=document.getElementById('iaRail');
+  rail.classList.toggle('collapsed', !railOpen);
+  if(!railOpen){
+    rail.innerHTML = `
+      <button class="dock-strip" onclick="toggleRail()" title="Mostrar análises">
+        <i class="ph ph-caret-right"></i>
+        <span class="dock-strip-n">${all.length}</span>
+        <span class="dock-strip-lbl">Análises</span>
+      </button>`;
+    return;
+  }
+
+  rail.innerHTML = `
     <!-- ANGULAR: bloco de geração — escopo fixo na jornada + período -->
     <div class="ia-rail-new">
       <span class="ia-rail-lbl">Nova análise</span>
@@ -1666,7 +1737,11 @@ function renderRail(){
     </div>
 
     <div class="ia-rail-hdr">
-      <h4>Análises <span class="n">${all.length}</span></h4>
+      <div style="display:flex;align-items:flex-start;gap:8px">
+        <h4 style="flex:1">Análises <span class="n">${all.length}</span></h4>
+        <button class="dock-btn" onclick="toggleRail()" title="Recolher">
+          <i class="ph ph-caret-left"></i></button>
+      </div>
       <p>Reabra uma análise concluída a qualquer momento, sem novo processamento.</p>
     </div>
     <div class="ia-rail-filters">
@@ -1725,6 +1800,71 @@ function renderRail(){
   /* mantém a análise aberta visível no rail */
   const sel=document.getElementById('ra-'+curAn);
   if(sel) sel.scrollIntoView({block:'nearest'});
+}
+
+/* ── coluna da direita: chat sobre a análise aberta ──
+   Reunião 17/09 — decisão 7: o chat permanece */
+function renderChatDock(){
+  const el=document.getElementById('iaChatDock');
+  if(!el) return;
+  const a=cur.ia.analyses.find(x=>x.id===curAn);
+
+  el.classList.toggle('collapsed', !chatOpen);
+  if(!chatOpen){
+    el.innerHTML = `
+      <button class="dock-strip" onclick="toggleChat()" title="Abrir o chat">
+        <i class="ph ph-chat-circle-dots"></i>
+        <span class="dock-strip-lbl">Perguntar</span>
+      </button>`;
+    return;
+  }
+
+  const head = `
+    <div class="ia-chat-hdr">
+      <div class="ia-chat-hdr-t">
+        <h4><i class="ph ph-chat-circle-dots"></i> Perguntar</h4>
+        <p>${a
+          ? `Respostas com base em <strong>${cur.name}</strong>, de ${fmt(a.start)} a ${fmt(a.end)}.`
+          : 'Abra uma análise para perguntar sobre os dados dela.'}</p>
+      </div>
+      <button class="dock-btn" onclick="toggleChat()" title="Recolher">
+        <i class="ph ph-caret-right"></i></button>
+    </div>`;
+
+  if(!a){
+    el.innerHTML = head + `
+      <div class="ia-chat-body">
+        <div class="empty" style="padding:32px 8px">
+          <i class="ph ph-chat-circle-dots"></i>
+          <h5>Nenhuma análise aberta</h5>
+          <p>Escolha uma análise na lista ao lado ou gere uma nova.</p>
+        </div>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = head + `
+    <div class="ia-chat-body" id="chatBody">
+      <div class="chat" id="chat">${renderQa(a)}</div>
+    </div>
+    <div class="ia-chat-foot">
+      <div class="chips">
+        <span class="chip" onclick="chipAsk(this)">Por que os contatos abandonam a conversa?</span>
+        <span class="chip" onclick="chipAsk(this)">O que mais aparece nas sugestões?</span>
+        <span class="chip" onclick="chipAsk(this)">Qual o horário com mais recusa?</span>
+      </div>
+      <div class="ask">
+        <textarea id="askInput" placeholder="Pergunte algo sobre esta análise…"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ask();}"></textarea>
+        <button class="btn btn-prim" onclick="ask()"><i class="ph ph-paper-plane-tilt"></i></button>
+      </div>
+      <div class="field-hint">Perguntas e respostas ficam salvas junto a esta análise.</div>
+    </div>`;
+  chatScroll();
+}
+function chatScroll(){
+  const b=document.getElementById('chatBody');
+  if(b) b.scrollTop=b.scrollHeight;
 }
 
 /* ── coluna direita: o relatório da análise selecionada ── */
@@ -1931,25 +2071,6 @@ function reportBlock(){
 
   ${scenarioBlocks(a)}
 
-  <!-- Reunião 17/09 — decisão 7: o chat permanece -->
-  <div class="sec"><div class="sec-hdr" style="padding:18px 20px">
-    <div class="sec-ttl"><h4 style="font-size:16px">Perguntar sobre esta análise</h4>
-      <p>As respostas consideram esta jornada no período de ${fmt(a.start)} a ${fmt(a.end)}</p></div></div>
-    <div class="sec-body">
-      <div class="chat" id="chat">${renderQa(a)}</div>
-      <div class="chips">
-        <span class="chip" onclick="chipAsk(this)">Por que os contatos abandonam a conversa?</span>
-        <span class="chip" onclick="chipAsk(this)">O que mais aparece nas sugestões?</span>
-        <span class="chip" onclick="chipAsk(this)">Qual o horário com mais recusa?</span>
-      </div>
-      <div class="ask">
-        <textarea id="askInput" placeholder="Pergunte algo sobre os dados desta análise…"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ask();}"></textarea>
-        <button class="btn btn-prim" onclick="ask()"><i class="ph ph-paper-plane-tilt"></i> Enviar</button>
-      </div>
-      <div class="field-hint">Perguntas e respostas ficam salvas junto a esta análise.</div>
-    </div>
-  </div>
   `;
 }
 
@@ -2173,11 +2294,13 @@ function ask(){
   const chat=document.getElementById('chat');
   chat.innerHTML = renderQa(a) + `<div class="msg"><div class="msg-av"><i class="ph ph-sparkle"></i></div>
     <div class="bub"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
+  chatScroll();
   setTimeout(()=>{
     const r=answer(q,a);
     a.qa.push({role:'ia', text:r.html, time:hhmm(), add:r.add||null});
     const c=document.getElementById('chat');
     if(c) c.innerHTML = renderQa(a);
+    chatScroll();
   },1100);
 }
 
