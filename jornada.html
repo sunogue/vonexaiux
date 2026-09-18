@@ -360,8 +360,8 @@
   font-size:11px;font-weight:700;color:var(--neutral-color-low-light);
   text-transform:uppercase;letter-spacing:.05em;
 }
-.ia-rail-new .per{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
-.ia-rail-new .per-btn{padding:0 4px;font-size:11.5px;height:30px;}
+.ia-rail-new .per{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;}
+.ia-rail-new .per-btn{padding:0 2px;font-size:11px;height:30px;}
 .ia-rail-dates{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .ia-rail-dates label{
   font-size:10px;font-weight:600;color:var(--neutral-color-low-light);
@@ -1333,6 +1333,7 @@ let busy     = false;
 
 /* ── utilitários ── */
 function fmt(i){ if(!i) return '—'; const [y,m,d]=i.split('-'); return `${d}/${m}/${y}`; }
+function diasTxt(n){ return n===1 ? '1 dia' : `${n} dias`; }
 function nDays(a,b){ if(!a||!b) return 0; return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000)+1; }
 function isoOf(d){ return d.toISOString().slice(0,10); }
 function hhmm(){ const n=new Date(); return `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`; }
@@ -1628,8 +1629,11 @@ function rangeState(){
   if(d<=0) return {ok:false, cls:'err', msg:'A data final deve ser posterior à data inicial.'};
   if(d>30) return {ok:false, cls:'err', msg:`Período de <strong>${d} dias</strong> — o limite por análise é de 30 dias.`};
   const vol=Math.round(cur.convPerDay*d);
-  if(vol<120) return {ok:true, cls:'warn', d, msg:`Cerca de <strong>${vol} conversas</strong> no período. A análise pode não ser representativa.`};
-  return {ok:true, cls:'', d, msg:`Período de <strong>${d} dias</strong> · cerca de ${vol.toLocaleString('pt-BR')} conversas.`};
+  /* Limite mínimo segue [a definir] no card. Com a recorrência diária
+     acordada em 17/09, 120 conversas reprovaria toda análise de um dia —
+     baixei para 40 até o número real ser definido. */
+  if(vol<40) return {ok:true, cls:'warn', d, msg:`Cerca de <strong>${vol} conversas</strong> no período. A análise pode não ser representativa.`};
+  return {ok:true, cls:'', d, msg:`Período de <strong>${diasTxt(d)}</strong> · cerca de ${vol.toLocaleString('pt-BR')} conversas.`};
 }
 
 function renderIaPane(){
@@ -1688,6 +1692,7 @@ function renderRail(){
     <div class="ia-rail-new">
       <span class="ia-rail-lbl">Nova análise</span>
       <div class="per">
+        <button class="per-btn ${per.preset===1?'on':''}"  onclick="setPeriod(1)">1d</button>
         <button class="per-btn ${per.preset===7?'on':''}"  onclick="setPeriod(7)">7d</button>
         <button class="per-btn ${per.preset===14?'on':''}" onclick="setPeriod(14)">14d</button>
         <button class="per-btn ${per.preset===30?'on':''}" onclick="setPeriod(30)">30d</button>
@@ -1862,7 +1867,7 @@ function renderReportCol(){
     <div class="rep-sticky">
       <div class="rep-sticky-t">
         <div class="rep-sticky-p">${fmt(a.start)} – ${fmt(a.end)}
-          <span style="font-weight:400;color:var(--neutral-color-low-light)">(${nDays(a.start,a.end)} dias)</span></div>
+          <span style="font-weight:400;color:var(--neutral-color-low-light)">(${diasTxt(nDays(a.start,a.end))})</span></div>
         <div class="rep-sticky-m">
           <span><i class="ph ${a.type==='recorrente'?'ph-arrows-clockwise':'ph-hand-pointing'}"></i> ${a.type==='recorrente'?'Recorrente':'Manual'}</span>
           <span class="sep"></span><span>Gerada em ${a.at}</span>
@@ -2063,7 +2068,7 @@ function renderGerar(){
 
   document.getElementById('gerarScope').innerHTML =
     `<i class="ph ph-tree-structure"></i> ${cur.name}
-     <span class="sep"></span> ${fmt(per.start)} – ${fmt(per.end)} (${st.d} dias)`;
+     <span class="sep"></span> ${fmt(per.start)} – ${fmt(per.end)} (${diasTxt(st.d)})`;
 
   document.getElementById('gerarList').innerHTML = `
     <div class="an-opt ${gerarSel.sugestoes?'on':''}" onclick="toggleGerar('sugestoes')">
