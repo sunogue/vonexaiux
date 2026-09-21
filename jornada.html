@@ -2287,8 +2287,13 @@ function rowT(id){ const el=document.getElementById(id); if(el) el.classList.tog
    ──────────────────────────────────────────────────────────── */
 function renderQa(a){
   if(!a.qa.length){
+    const scns=cur.ia.scenarios.filter(x=>x.on && x.name);
     return `<div class="msg"><div class="msg-av"><i class="ph ph-sparkle"></i></div>
-      <div><div class="bub">Pergunte o que quiser sobre esta análise. Respondo apenas com base nos dados desta jornada no período selecionado.</div></div></div>`;
+      <div><div class="bub">Oi! Li as conversas de <strong>${cur.name}</strong> entre ${fmt(a.start)} e ${fmt(a.end)}.
+        Nesta análise eu tenho as sugestões de melhoria${scns.length
+          ? ` e ${scns.length===1?'a análise':'as análises'} ${scns.map(x=>`<strong>${x.name}</strong>`).join(', ')}`
+          : ''}.
+        Pode perguntar à vontade — se eu não tiver o dado, eu te falo.</div></div></div>`;
   }
   return a.qa.map(m=>`
     <div class="msg ${m.role==='me'?'me':''}">
@@ -2322,28 +2327,87 @@ function ask(){
 /* Respostas restritas ao recorte: esta jornada + este período */
 /* Reunião 17/09 — decisão 7: se o dado não existe na análise, a IA diz
    que não tem e oferece incluir a partir do próximo processamento. */
+/* Sugere um nome de análise a partir da pergunta, para o usuário não
+   ter que inventar do zero ao ir configurar. */
+function sugereNome(q){
+  const s=q.toLowerCase();
+  const mapa=[
+    [/atendente|operador|quem atende|equipe/,        'Desempenho por atendente'],
+    [/hor[áa]ri|que horas|turno|per[íi]odo do dia/,  'Melhor horário de contato'],
+    [/concorrent/,                                   'Concorrentes citados pelo contato'],
+    [/objeç|objec|recusa|n[ãa]o quer|negou/,         'Objeções mais frequentes'],
+    [/motivo|por que|porqu|raz[ãa]o/,                'Motivo informado pelo contato'],
+    [/pagament|pagar|valor|pre[çc]o|desconto/,       'Condições de pagamento citadas'],
+    [/sentiment|humor|irritad|satisfeit|nervos/,     'Tom da conversa'],
+    [/produto|servi[çc]o|plano/,                     'Produtos e serviços mencionados'],
+    [/prazo|demora|tempo de resposta/,               'Prazos citados na conversa'],
+    [/canal|whats|liga[çc]|telefone|e-?mail/,        'Canal preferido do contato'],
+  ];
+  for(const [re,nome] of mapa) if(re.test(s)) return nome;
+
+  let t=q.replace(/^\s*(qual|quais|quantos?|quantas?|quando|onde|como|por\s?que|o que|quem)\s+/i,'')
+         .replace(/^(é|e|foi|s[ãa]o|tem|teve|houve)\s+/i,'')
+         .replace(/[?.!]+\s*$/,'').trim();
+  if(!t) return 'Nova análise';
+  t=t.charAt(0).toUpperCase()+t.slice(1);
+  return t.length>52 ? t.slice(0,52)+'…' : t;
+}
+
 function answer(q,a){
   const s=q.toLowerCase(), r=REPORT;
 
-  if(/outra jornada|todas as jornadas|renova[çc]|onboarding|m[êe]s passado|outro per[íi]odo/.test(s)){
-    return {html:`Não tenho dados desse recorte. Esta análise cobre <strong>${cur.name}</strong> entre ${fmt(a.start)} e ${fmt(a.end)}.`};
+  /* cortesias — o chat responde como gente */
+  if(/^\s*(oi|ol[áa]|bom dia|boa tarde|boa noite|e a[íi])\b/.test(s)){
+    return {html:`Oi! Pode perguntar o que quiser sobre esta análise.`};
   }
-  if(/melhor|sugest|fluxo|otimiz|abandon|desist/.test(s)){
-    return {html:`A sugestão de maior impacto é <strong>${r.suggestions[0].title.toLowerCase()}</strong>. ${r.suggestions[0].desc} Ponto indicado: <strong>${r.suggestions[0].node}</strong>.`};
+  if(/obrigad|valeu|show|perfeito|legal/.test(s) && s.length<40){
+    return {html:`Imagina. Se precisar de mais alguma coisa sobre esta jornada, é só chamar.`};
   }
-  const scn = cur.ia.scenarios.find(x=>x.on && x.name &&
-    s.includes(x.name.toLowerCase().split(' ')[0]));
-  if(scn){
-    const res=SCENARIO_RESULTS[scn.id]||genericScenario(scn);
-    return {html:`Na análise <strong>${scn.name}</strong>: ${res.intro}
-      <ul>${res.findings.slice(0,3).map(f=>`<li>${f.label} — ${f.n} (${f.pct}%)</li>`).join('')}</ul>`};
+  if(/o que voc[êe] (tem|sabe|consegue)|como funciona|o que d[áa] pra perguntar|me ajuda/.test(s)){
+    const scns=cur.ia.scenarios.filter(x=>x.on && x.name);
+    return {html:`Nesta análise eu li as conversas e os atendimentos de <strong>${cur.name}</strong>
+      no período e produzi as sugestões de melhoria${scns.length?` e ${scns.map(x=>`<strong>${x.name}</strong>`).join(', ')}`:''}.
+      Posso detalhar qualquer uma dessas, ou cruzar o que aparece nelas.`};
   }
 
-  /* fora do que foi processado */
-  return {
-    html:`Esse dado não está nesta análise. Para passar a ter isso, crie uma
-      análise personalizada nas configurações da IA, na aba <strong>Dados da jornada</strong>.`,
-  };
+  /* fora do recorte */
+  if(/outra jornada|todas as jornadas|renova[çc]|onboarding|m[êe]s passado|outro per[íi]odo|ano passado/.test(s)){
+    return {html:`Essa eu não consigo responder daqui — esta análise cobre só a jornada
+      <strong>${cur.name}</strong>, de ${fmt(a.start)} a ${fmt(a.end)}.
+      Para outra jornada, a IA Panorâmica dela tem as próprias análises.`};
+  }
+
+  /* sugestões de melhoria — listar todas vem antes, é mais específico.
+     "melhor" sozinho não entra: "melhor horário" não é sobre sugestão. */
+  if(/quantas sugest|todas as sugest|outras sugest|quais (s[ãa]o )?as sugest|o que mais aparece|conta essa/.test(s)){
+    return {html:`São ${r.suggestions.length} no total:
+      <ul>${r.suggestions.map(x=>`<li>${x.title}</li>`).join('')}</ul>
+      Cada uma tem o ponto do fluxo indicado no relatório, ao lado.`};
+  }
+  if(/sugest|melhoria|melhorar|otimiz|no fluxo|transbord|abandon|desist/.test(s)){
+    const s1=r.suggestions[0], s2=r.suggestions[1];
+    return {html:`A que mais pesa é <strong>${s1.title.toLowerCase()}</strong>. ${s1.desc}
+      O ponto do fluxo seria em <strong>${s1.node}</strong>.
+      <br><br>Logo atrás vem ${s2.title.toLowerCase()} — se quiser, te conto essa também.`};
+  }
+
+  /* análises personalizadas da jornada */
+  const scn = cur.ia.scenarios.find(x=>x.on && x.name &&
+    x.name.toLowerCase().split(/\s+/).some(w=>w.length>4 && s.includes(w)));
+  if(scn){
+    const res=SCENARIO_RESULTS[scn.id]||genericScenario(scn);
+    return {html:`Essa está em <strong>${scn.name}</strong>. ${res.intro}
+      <ul>${res.findings.slice(0,3).map(f=>`<li>${f.label} — ${f.n} (${f.pct}%)</li>`).join('')}</ul>
+      O bloco completo está no relatório, com os exemplos de conversa.`};
+  }
+
+  /* não foi extraído — sugere o nome da análise */
+  const nome=sugereNome(q);
+  return {html:`Isso eu não tenho: não foi extraído nesta geração, então nem as conversas
+    eu reli procurando por isso.
+    <br><br>Se for útil daqui pra frente, dá para criar uma análise personalizada — algo como
+    <strong>“${nome}”</strong> — na aba <strong>Dados da jornada</strong>, no cartão da IA Panorâmica.
+    A partir da próxima geração isso passa a aparecer no relatório.`};
 }
 
 /* ════════════════════════════════════════════════════════════
