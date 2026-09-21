@@ -2164,18 +2164,6 @@ function openExemplo(){
   document.getElementById('detModal').classList.add('open');
 }
 
-/* ── Chat: transformar a pergunta sem resposta em análise ── */
-function incluirNaProxima(el, pergunta){
-  cur.ia.scenarios.push({
-    id:'s'+Date.now(), on:true, open:false,
-    name: pergunta.length>48 ? pergunta.slice(0,48)+'…' : pergunta,
-    desc: pergunta,
-  });
-  renderScenarios();
-  el.outerHTML = '<span class="chip" style="border-color:var(--feedback-color-success-pure);color:var(--feedback-color-success-dark)"><i class="ph ph-check"></i> Incluída nas análises da jornada</span>';
-  toast('ok','Análise criada. Entra no próximo processamento desta jornada.');
-}
-
 /* ════════════════════════════════════════════════════════════
    DETALHAMENTO EM MODAL — vale para todos os cards do relatório
 ════════════════════════════════════════════════════════════ */
@@ -2306,9 +2294,6 @@ function renderQa(a){
     <div class="msg ${m.role==='me'?'me':''}">
       <div class="msg-av">${m.role==='me'?'SS':'<i class="ph ph-sparkle"></i>'}</div>
       <div><div class="bub">${m.text}</div>
-        ${m.add?`<div class="chips" style="margin-top:8px">
-          <span class="chip" onclick="incluirNaProxima(this,'${m.add.replace(/'/g,"\\'")}')">
-            <i class="ph ph-plus-circle"></i> Incluir a partir do próximo processamento</span></div>`:''}
         <div class="msg-t" style="${m.role==='me'?'text-align:right':''}">${m.time}</div></div>
     </div>`).join('');
 }
@@ -2327,7 +2312,7 @@ function ask(){
   chatScroll();
   setTimeout(()=>{
     const r=answer(q,a);
-    a.qa.push({role:'ia', text:r.html, time:hhmm(), add:r.add||null});
+    a.qa.push({role:'ia', text:r.html, time:hhmm()});
     const c=document.getElementById('chat');
     if(c) c.innerHTML = renderQa(a);
     chatScroll();
@@ -2356,9 +2341,8 @@ function answer(q,a){
 
   /* fora do que foi processado */
   return {
-    html:`Esse dado não está nesta análise — ele não foi extraído no processamento.
-      Quer que eu passe a incluir isso a partir do próximo?`,
-    add:q,
+    html:`Esse dado não está nesta análise. Para passar a ter isso, crie uma
+      análise personalizada nas configurações da IA, na aba <strong>Dados da jornada</strong>.`,
   };
 }
 
