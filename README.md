@@ -118,3 +118,4 @@ Decisão nova desta proposta, que precisa ser validada: **o que acontece com as
 análises já geradas quando o usuário desliga o toggle.** Aqui a aba some e as
 análises ficam indisponíveis, sem serem apagadas — mas isso é uma escolha do
 protótipo, não do card.
+# vonexaiux
