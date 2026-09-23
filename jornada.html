@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
 <style>
 /* ══════════════════════════════════════════════════════════════
-   IA PANORÂMICA (CCM-3269) — PROPOSTA C: NATIVA DA JORNADA
+   VONEX INTELLIGENCE (CCM-3269) — PROPOSTA C: NATIVA DA JORNADA
    Habilitada na criação da jornada; a análise vira uma aba dela.
    ANGULAR: JourneyModule — src/app/@modules/journey/
    ══════════════════════════════════════════════════════════════ */
@@ -641,7 +641,7 @@
 .modal.det .modal-ftr{padding:14px 28px 20px;border-top:1px solid var(--neutral-color-high-light);flex-shrink:0;justify-content:space-between;}
 .det-ftr-note{font-size:11.5px;color:var(--neutral-color-low-light);}
 
-/* ══ ABA IA PANORÂMICA ══════════════════════════════════════ */
+/* ══ ABA VONEX INTELLIGENCE ══════════════════════════════════════ */
 .per{display:flex;gap:6px;flex-wrap:wrap;}
 .per-btn{
   height:32px;padding:0 12px;border-radius:var(--r-pill);
@@ -797,7 +797,7 @@
 </head>
 <body>
 <!-- ══════════════════════════════════════════════════════════════
-     IA PANORÂMICA (CCM-3269) — PROPOSTA C
+     VONEX INTELLIGENCE (CCM-3269) — PROPOSTA C
      A IA é uma configuração da jornada, habilitada na criação,
      e a análise vira uma aba da própria jornada.
      ══════════════════════════════════════════════════════════════ -->
@@ -885,7 +885,7 @@
           <button class="jr-tab" id="tab-mon"   onclick="jrTab('mon')">Monitoramento</button>
           <button class="jr-tab" id="tab-prev"  onclick="jrTab('prev')">Prévia de testes</button>
           <button class="jr-tab ia" id="tab-ia" onclick="jrTab('ia')" style="display:none">
-            <i class="ph ph-sparkle"></i> IA Panorâmica
+            <i class="ph ph-sparkle"></i> Vonex Intelligence
           </button>
         </div>
 
@@ -950,13 +950,13 @@
               </div>
             </div>
 
-            <!-- ══ NOVO: IA PANORÂMICA COMO CONFIGURAÇÃO DA JORNADA ══ -->
+            <!-- ══ NOVO: VONEX INTELLIGENCE COMO CONFIGURAÇÃO DA JORNADA ══ -->
             <!-- ANGULAR: <app-journey-panoramic-config formGroupName="panoramicAi"> -->
             <div class="sec ia off" id="secIa">
               <div class="sec-hdr">
                 <span class="sec-ok"><i class="ph ph-sparkle"></i></span>
                 <div class="sec-ttl">
-                  <h4>IA Panorâmica</h4>
+                  <h4>Vonex Intelligence</h4>
                   <p>Análise da jornada, das conversas e dos atendimentos pela IA da Vonex</p>
                 </div>
                 <button class="sec-caret" onclick="secToggle(this)"><i class="ph ph-caret-up"></i></button>
@@ -966,9 +966,9 @@
                 <div class="ia-switch" id="iaSwitch">
                   <span class="toggle" id="iaToggle" onclick="toggleIa()"></span>
                   <div class="ia-switch-body">
-                    <div class="ia-switch-ttl">Usar a IA Panorâmica nesta jornada</div>
+                    <div class="ia-switch-ttl">Usar o Vonex Intelligence nesta jornada</div>
                     <div class="ia-switch-sub">
-                      Habilita a aba <strong>IA Panorâmica</strong>, com as sugestões de melhoria geradas
+                      Habilita a aba <strong>Vonex Intelligence</strong>, com as sugestões de melhoria geradas
                       pela IA, as análises que você criar e um chat sobre os dados da jornada.
                     </div>
                   </div>
@@ -1095,7 +1095,7 @@
           </div>
         </div>
 
-        <!-- ══ ABA: IA PANORÂMICA — a análise vive dentro da jornada ══ -->
+        <!-- ══ ABA: VONEX INTELLIGENCE — a análise vive dentro da jornada ══ -->
         <!-- ANGULAR: JourneyPanoramicComponent — src/app/@modules/journey/components/journey-panoramic/ -->
         <!-- ANGULAR: layout mestre-detalhe — rail de análises + relatório -->
         <div class="jr-body split" id="pane-ia" style="display:none">
@@ -1172,7 +1172,7 @@
 
 <script>
 /* ════════════════════════════════════════════════════════════
-   IA PANORÂMICA (CCM-3269) — PROPOSTA C: NATIVA DA JORNADA
+   VONEX INTELLIGENCE (CCM-3269) — PROPOSTA C: NATIVA DA JORNADA
    O escopo da análise é a própria jornada — não há seletor de
    jornada em lugar nenhum. O usuário escolhe apenas o período.
 ════════════════════════════════════════════════════════════ */
@@ -1395,7 +1395,7 @@ function renderList(){
         <div class="jcard-acts">
           ${j.ia.enabled?`
             <!-- atalho para a aba de análise da própria jornada -->
-            <button class="jact ia" title="IA Panorâmica" onclick="openJourney('${j.id}','ia')">
+            <button class="jact ia" title="Vonex Intelligence" onclick="openJourney('${j.id}','ia')">
               <i class="ph ph-sparkle"></i>${fresh?'<span class="dot"></span>':''}
             </button>`:''}
           <button class="jact" title="Visualizar"><i class="ph ph-eye"></i></button>
@@ -1414,7 +1414,7 @@ function renderList(){
         <span class="jmeta"><i class="ph ph-git-branch"></i> Versão em uso: ${j.version}</span>
         <span class="jmeta"><i class="ph ph-phone-call"></i> ${j.trigger}</span>
         <span class="jmeta id"><i class="ph ph-globe"></i> ${j.uid}</span>
-        ${j.ia.enabled?'<span class="badge-ia"><i class="ph ph-sparkle"></i> IA Panorâmica</span>':''}
+        ${j.ia.enabled?'<span class="badge-ia"><i class="ph ph-sparkle"></i> Vonex Intelligence</span>':''}
       </div>
     </div>`;
   }).join('');
@@ -1497,10 +1497,10 @@ function toggleIa(){
   document.getElementById('secIa').classList.toggle('off', !cur.ia.enabled);
   syncIaTab();
   if(cur.ia.enabled){
-    toast('ok','IA Panorâmica habilitada. A aba foi adicionada à jornada.');
+    toast('ok','Vonex Intelligence habilitado. A aba foi adicionada à jornada.');
   } else {
     if(document.getElementById('tab-ia').classList.contains('active')) jrTab('dados');
-    toast('warn','IA Panorâmica desabilitada. A aba e as análises ficam indisponíveis.');
+    toast('warn','Vonex Intelligence desabilitado. A aba e as análises ficam indisponíveis.');
   }
 }
 
@@ -1630,7 +1630,7 @@ function delScenario(id){
 }
 
 /* ════════════════════════════════════════════════════════════
-   ABA IA PANORÂMICA — escopo = a própria jornada
+   ABA VONEX INTELLIGENCE — escopo = a própria jornada
 ════════════════════════════════════════════════════════════ */
 function setPeriod(n, silent){
   const end=new Date(), start=new Date(); start.setDate(start.getDate()-(n-1));
@@ -2374,7 +2374,7 @@ function answer(q,a){
   if(/outra jornada|todas as jornadas|renova[çc]|onboarding|m[êe]s passado|outro per[íi]odo|ano passado/.test(s)){
     return {html:`Essa eu não consigo responder daqui — esta análise cobre só a jornada
       <strong>${cur.name}</strong>, de ${fmt(a.start)} a ${fmt(a.end)}.
-      Para outra jornada, a IA Panorâmica dela tem as próprias análises.`};
+      Para outra jornada, o Vonex Intelligence dela tem as próprias análises.`};
   }
 
   /* sugestões de melhoria — listar todas vem antes, é mais específico.
@@ -2406,7 +2406,7 @@ function answer(q,a){
   return {html:`Isso eu não tenho: não foi extraído nesta geração, então nem as conversas
     eu reli procurando por isso.
     <br><br>Se for útil daqui pra frente, dá para criar uma análise personalizada — algo como
-    <strong>“${nome}”</strong> — na aba <strong>Dados da jornada</strong>, no cartão da IA Panorâmica.
+    <strong>“${nome}”</strong> — na aba <strong>Dados da jornada</strong>, no cartão do Vonex Intelligence.
     A partir da próxima geração isso passa a aparecer no relatório.`};
 }
 
